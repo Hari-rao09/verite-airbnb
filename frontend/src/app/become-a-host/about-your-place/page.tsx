@@ -213,7 +213,9 @@ export default function AboutYourPlacePage() {
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch("http://localhost:8000/listings/", {
+    const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/listings/`,
+  {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
