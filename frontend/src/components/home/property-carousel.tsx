@@ -2,20 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Property } from "@/types";
 import PropertyCard from "./property-card";
 
-export interface Property {
-  id: string;
-  title: string;
-  location: string;
-  distance: string;
-  dates: string;
-  price: number;
-  rating: number;
-  images: string[];
-  isSuperhost?: boolean;
-  isGuestFavorite?: boolean;
-}
+
 
 interface PropertyCarouselProps {
   properties: Property[];

@@ -231,7 +231,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             <Star className="w-3.5 h-3.5 fill-secondary text-secondary" />
 
             <span className="text-sm text-secondary">
-              {property.rating.toFixed(2)}
+              {(property.rating ?? 0).toFixed(2)}
             </span>
           </div>
         </div>

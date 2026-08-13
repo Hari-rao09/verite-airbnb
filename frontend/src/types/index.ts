@@ -31,6 +31,8 @@ export interface Property {
   host?: User
   createdAt: string
   updatedAt: string
+  isGuestFavorite?: boolean
+  rating?: number
 }
 
 export interface Booking {

@@ -1,6 +1,17 @@
-import type { Property } from "@/components/home/property-carousel";
+export interface MockProperty {
+  id: string;
+  title: string;
+  location: string;
+  distance: string;
+  dates: string;
+  price: number;
+  rating: number;
+  images: string[];
+  isGuestFavorite?: boolean;
+  isSuperhost?: boolean;
+}
 
-// Imágenes placeholder de ejemplo (en producción vendrían de la API)
+// Placeholder images for demo/mock marketplace content
 const placeholderImages = [
   "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80",
   "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
@@ -22,7 +33,7 @@ const placeholderImages3 = [
   "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80",
 ];
 
-export const mockProperties: Property[] = [
+export const mockProperties: MockProperty[] = [
   {
     id: "1",
     title: "Ático luminoso en el centro",
@@ -101,7 +112,7 @@ export const mockProperties: Property[] = [
   },
 ];
 
-export const trendingProperties: Property[] = [
+export const trendingProperties: MockProperty[] = [
   {
     id: "8",
     title: "Casa rural con encanto",
@@ -178,7 +189,7 @@ export const trendingProperties: Property[] = [
   },
 ];
 
-export const nearbyProperties: Property[] = [
+export const nearbyProperties: MockProperty[] = [
   {
     id: "15",
     title: "Casa de campo tranquila",
