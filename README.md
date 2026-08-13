@@ -3,6 +3,7 @@
 > **Scaler AI Assignment — Full-Stack Engineering Submission**
 
 AirClone is a full-stack accommodation booking platform built as part of a **Scaler AI assignment**. It recreates the core Airbnb-style discovery and booking experience with a polished Next.js frontend and a FastAPI backend.
+Live On : https://air-clone-eta.vercel.app/
 
 The focus was not only on reproducing the UI, but on creating a realistic product flow where a reviewer can **discover a property, open its listing, authenticate, and test the booking journey**.
 
