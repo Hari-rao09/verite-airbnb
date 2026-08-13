@@ -13,6 +13,16 @@ class ListingCreate(BaseModel):
     location: str
 
 
+class ListingPhotoResponse(BaseModel):
+    id: int
+    listing_id: int
+    image_url: str
+    display_order: int
+
+    class Config:
+        from_attributes = True
+
+
 class ListingResponse(BaseModel):
     id: int
     title: str
@@ -26,6 +36,8 @@ class ListingResponse(BaseModel):
     location: str
     host_id: int
     is_active: int
+
+    photos: list[ListingPhotoResponse] = []
 
     class Config:
         from_attributes = True

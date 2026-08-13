@@ -5,8 +5,7 @@ from passlib.context import CryptContext
 from app.security import create_access_token, get_current_user
 from app.database import get_db
 from app.models import User
-from app.schemas.user import UserCreate, UserResponse
-
+from app.schemas.user import UserCreate, UserLogin, UserUpdate, UserResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -41,7 +40,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-def login(user: UserCreate, db: Session = Depends(get_db)):
+def login(user: UserLogin, db: Session = Depends(get_db)):
 
     existing_user = db.query(User).filter(User.email == user.email).first()
 
@@ -72,6 +71,41 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
     }
 @router.get("/me")
 def get_me(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "is_host": current_user.is_host
+    }
+
+
+@router.patch("/me")
+def update_me(
+    user: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    existing_user = (
+        db.query(User)
+        .filter(
+            User.email == user.email,
+            User.id != current_user.id
+        )
+        .first()
+    )
+
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
+
+    current_user.name = user.name
+    current_user.email = user.email
+
+    db.commit()
+    db.refresh(current_user)
+
     return {
         "id": current_user.id,
         "name": current_user.name,

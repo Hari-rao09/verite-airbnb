@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Wishlist
+from app.models.wishlist import Wishlist
+from app.models.listing import Listing
 from app.security import get_current_user
 from app.schemas.wishlist import WishlistResponse
+
 
 router = APIRouter(
     prefix="/wishlist",
@@ -12,12 +14,30 @@ router = APIRouter(
 )
 
 
-@router.post("/{listing_id}", response_model=WishlistResponse)
+# Add listing to wishlist
+@router.post(
+    "/{listing_id}",
+    response_model=WishlistResponse
+)
 def add_to_wishlist(
     listing_id: int,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
+    # Check that listing exists
+    listing = (
+        db.query(Listing)
+        .filter(Listing.id == listing_id)
+        .first()
+    )
+
+    if not listing:
+        raise HTTPException(
+            status_code=404,
+            detail="Listing not found"
+        )
+
+    # Check if already saved
     existing = (
         db.query(Wishlist)
         .filter(
@@ -45,6 +65,7 @@ def add_to_wishlist(
     return wishlist
 
 
+# Remove listing from wishlist
 @router.delete("/{listing_id}")
 def remove_from_wishlist(
     listing_id: int,
@@ -74,14 +95,20 @@ def remove_from_wishlist(
     }
 
 
-@router.get("/", response_model=list[WishlistResponse])
+# Get current user's wishlist
+@router.get(
+    "/",
+    response_model=list[WishlistResponse]
+)
 def get_my_wishlist(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
     wishlist = (
         db.query(Wishlist)
-        .filter(Wishlist.user_id == current_user.id)
+        .filter(
+            Wishlist.user_id == current_user.id
+        )
         .all()
     )
 

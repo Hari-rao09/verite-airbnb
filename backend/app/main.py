@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routers import auth
+from fastapi.middleware.cors import CORSMiddleware
 from app.routers.wishlist import router as wishlist_router
 from app.routers.reviews import router as reviews_router
 from app.routers.bookings import router as bookings_router
@@ -26,6 +27,13 @@ app = FastAPI(
     swagger_ui_parameters={
         "persistAuthorization": True
     }
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 app.include_router(auth.router)
 app.include_router(listings_router)
