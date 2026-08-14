@@ -1,4 +1,4 @@
-# AirClone — Full-Stack Accommodation Booking Platform
+# AirClone — Full-Stack Accommodation Discovery & Booking Platform
 
 <div align="center">
 
@@ -11,139 +11,99 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
 
-**A production-grade, full-stack Airbnb recreation built with Next.js 16 (React 19, Turbopack, Tailwind CSS v4) and FastAPI (Python 3.11, SQLAlchemy, SQLite, JWT Bearer Auth).**
+**A modern, production-grade Airbnb clone built with Next.js 16 (React 19, Turbopack, Tailwind CSS v4) and FastAPI (Python 3.11, SQLAlchemy, SQLite, JWT Bearer Auth).**
 
-[🚀 Live Demo](https://air-clone-eta.vercel.app/) • [📋 Assignment Feature Breakdown](#-assignment-requirements--feature-breakdown) • [🗄️ Database Schema](#%EF%B8%8F-database-schema--design) • [🤔 Assumptions Made](#-assumptions-made) • [💻 Local Setup & Seeding](#-getting-started-locally)
+[🚀 Explore Live App](https://air-clone-eta.vercel.app/) • [✨ Features Matrix](#-feature-matrix--capabilities) • [🏛️ Architecture](#-system-architecture) • [🗄️ Database Schema](#%EF%B8%8F-database-schema--erd) • [🔌 API Reference](#-rest-api-documentation) • [💻 Local Setup](#-getting-started-locally)
 
 </div>
 
 ---
 
-## 📋 Assignment Requirements & Feature Breakdown
+## 🌟 Overview
 
-This application fulfills **100% of the assignment requirements**, including all **Must-Have Core Features**, **Mocked/Placeholder Sections**, **Optional Bonus Features**, and **Database/Architecture Deliverables**.
+**AirClone** is a full-stack accommodation discovery and booking web application that recreates the Airbnb experience. It combines Airbnb’s signature design language, micro-animations, and responsive layout with an end-to-end booking lifecycle, dynamic calendar date-blocking, host management dashboards, interactive search filters, and dark mode support.
 
----
-
-### 1. 🏠 Core Feature 1: Home & Search (Must Have)
-* [x] **Grid of Listing Cards**:
-  * Displays high-resolution multi-photo carousels with smooth arrow navigation and pagination dots.
-  * Details each stay's title, location (City, State, Country), nightly rate (₹), overall guest star rating, and real-time wishlist heart toggle.
-* [x] **Search Bar (Location + Date Range + Guests)**:
-  * **Where (Location Autocomplete)**: Autosuggestion list with destination images and descriptions (*Noida, Goa, Manali, Mumbai, Jaipur, Wayanad, Rishikesh*).
-  * **When (Interactive Date Range Picker)**: 2-month side-by-side calendar. Dates that have elapsed are automatically greyed out and marked with a **red strike-through / diagonal cut** (`line-through decoration-rose-500`) and disabled from clicking. Clicking two future dates highlights the range and updates the search bar (*e.g., "28–30 Aug"*).
-  * **Who (Guest Counters)**: Interactive counters for Adults, Children, Infants, and Pets with max guest safety caps.
-* [x] **Category / Filter Row**:
-  * **Category Navigation**: Looping animated WebM video tabs (*Homes 🏠, Experiences 🎈, Services 🛎️*) and category pill carousels (*Amazing pools, Beachfront, Cabins, Iconic cities, Luxury havelis*).
-  * **Interactive Filter Modal (`FilterModal`)**:
-    * Price Range Histogram with dual Min/Max inputs (₹) and average price calculation.
-    * Type of Place selector (*Any type, Entire place, Room, Shared room*).
-    * Rooms & Beds selector pills for Bedrooms, Beds, and Bathrooms (`Any`, `1` to `8+`).
-    * Property Type card grid (*House, Flat, Villa, Cottage, Haveli, Studio, Treehouse, Cabin, Penthouse*).
-    * Categorized Amenities checklist (*Essentials, Features, Safety*).
-    * Booking Options toggle switches (*Instant Book*, *Self check-in*).
-* [x] **Pagination or Infinite Scroll**:
-  * 4-column responsive **Discovery Grid** showing all stays across India.
-  * Automated `IntersectionObserver` infinite scrolling with on/off toggle button.
-  * Progressive progress bar (*"Showing X of Y stays"*), "Show more stays" manual loader, and "Show all" button.
+### 🔗 Deployment Links
+* **Production Frontend:** [https://air-clone-eta.vercel.app/](https://air-clone-eta.vercel.app/)
+* **Backend API Base:** `http://localhost:8000` (or configured `NEXT_PUBLIC_API_URL`)
+* **API Documentation (Swagger):** `http://localhost:8000/docs`
 
 ---
 
-### 2. 🏡 Core Feature 2: Listing Detail Page (Must Have)
-* [x] **Photo Gallery**:
-  * 5-photo asymmetric mosaic hero layout with subtle hover zoom.
-  * Full-screen interactive **Photo Gallery Viewer Modal** with image counter.
-* [x] **Title, Description, Location, Amenities, Host Info**:
-  * Subtitle, expandable description section, and property specs (*Guests, Bedrooms, Beds, Bathrooms*).
-  * 35+ categorized amenities popup dialog (`AmenitiesModal`).
-  * Host presentation card featuring Superhost badge and **Identity Verified ✓** status.
-  * Interactive Leaflet map centered on property GPS coordinates with custom price marker.
-* [x] **Availability Calendar / Dynamic Date-Blocking**:
-  * Live 2-month interactive side-by-side calendar connected to backend (`GET /listings/{id}/booked-dates`).
-  * Dates reserved by existing confirmed reservations are struck through, greyed out, and unclickable.
-  * Month navigation arrows (`<` / `>`) to browse future months.
-  * Conflict warning banner (*"⚠️ Dates unavailable (already booked)"*) disabling the Reserve button on overlapping dates.
-* [x] **Price Breakdown (Nightly Rate × Nights + Fees)**:
-  * Dynamic calculation based on selected dates:
-    $$\text{Total Price} = (\text{Price per night} \times \text{Nights}) + \text{Cleaning Fee (₹500)} + \text{AirClone Service Fee (12\%)}$$
-* [x] **Reviews Section**:
-  * Overall rating laurel card (*Guest Favourite 4.90★*).
-  * Categorized rating metric bars (Cleanliness, Accuracy, Communication, Location, Value).
-  * Verified guest reviews with reviewer avatars, dates, and comments.
+## ✨ Feature Matrix & Capabilities
+
+| Feature Domain | Capability | Status | Implementation Details |
+| :--- | :--- | :---: | :--- |
+| **Home & Discovery** | Property Cards & Carousels | ✅ Live | Multi-photo carousel cards, star ratings, location, nightly rates (₹), and wishlist heart toggle |
+| | Global Search Bar | ✅ Live | Destination autocomplete with rich previews, guest counters, and 2-month date picker with past date cut markings |
+| | Interactive Filter Modal | ✅ Live | Price histogram slider, Type of place selector, rooms/beds pills, property type cards, and amenities checklist |
+| | Infinite Scroll & Grid | ✅ Live | 4-column Discovery Grid with automatic `IntersectionObserver` infinite scrolling and progressive loader |
+| **Listing Details** | Photo Gallery Viewer | ✅ Live | 5-photo asymmetric mosaic hero with full-screen interactive gallery modal |
+| | Specs & Host Presentation | ✅ Live | Subtitle, expandable descriptions, 35+ amenities modal, and host card with **Identity Verified ✓** badge |
+| | Dynamic Date-Blocking | ✅ Live | 2-month interactive calendar connected to backend (`GET /listings/{id}/booked-dates`) with booked date strikethroughs |
+| | Dynamic Price Breakdown | ✅ Live | Nightly rate × nights + ₹500 cleaning fee + 12% service fee itemized calculation |
+| | Reviews & Rating Breakdown | ✅ Live | Category rating bars (Cleanliness, Accuracy, Communication, Location, Value) + verified guest reviews |
+| | Interactive Location Map | ✅ Live | Leaflet map with custom marker centered at property coordinates |
+| **Booking Lifecycle** | Overlap & Capacity Validation | ✅ Live | Backend SQL overlap checks (`check_in < booking.check_out AND check_out > booking.check_in`) |
+| | Checkout & Summary | ✅ Live | Pre-filled `/booking/[id]` summary with cancellation policies and trip breakdown |
+| | Trips Dashboard ("My Trips") | ✅ Live | `/bookings` view with dates, guest count, pricing, status badges, and invoice view |
+| | Date Persistence | ✅ Live | Confirmed bookings persist in SQLite and block future dates across the app |
+| **Host Management** | Listing Creation Wizard | ✅ Live | Multi-step onboarding at `/become-a-host` with multi-photo upload, pricing, and amenities |
+| | Listing Management (CRUD) | ✅ Live | Update listing details at `/listing/[id]/edit` and soft-delete listings via profile |
+| | Host Reservations Dashboard | ✅ Live | Dedicated `/profile` tab with lifetime earnings (₹), guest details, status filters, and search |
+| **User & Trust** | JWT Authentication | ✅ Live | In-page modal for registration (`POST /auth/register`) and login (`POST /auth/login`) with JWT Bearer tokens |
+| | Identity Verification | ✅ Live | Profile sidebar trust card (*Government ID, Email, Phone verified*) and verified badges |
+| | Host-Guest Messaging | ✅ Live | **Messages & Host Inbox** modal with conversation threads, real-time search, and message composer |
+| | Post-Stay Reviews | ✅ Live | **Write a Review Modal** on `/bookings` with 5-star category ratings and persistent feedback |
+| **UI & Experience** | Dark / Night Mode | ✅ Live | Sun ☀️ / Moon 🌙 theme toggle with dark surfaces (`#121212`, `#181818`, `#242424`) and persistence |
+| | Animated Video Navigation | ✅ Live | Looping WebM video tabs for Homes 🏠, Experiences 🎈, and Services 🛎️ |
+| | Responsive Layout | ✅ Live | Mobile drawers, full-screen search modals, tablet grids, and desktop layouts |
+| | Database Seeding | ✅ Live | `python -m app.seed` creates 3 hosts, 2 guests, 8 diverse properties across India, bookings, and reviews |
 
 ---
 
-### 3. 💳 Core Feature 3: Booking Flow (Must Have)
-* [x] **Date Range & Guest Count Validation**:
-  * Backend SQL query conflict protection ensures no overlapping dates can be reserved:
-    ```sql
-    WHERE listing_id = :id AND status = 'confirmed'
-      AND check_in < :new_check_out AND check_out > :new_check_in
-    ```
-* [x] **Booking Summary & Mocked Checkout**:
-  * Dedicated `/booking/[id]` checkout page pre-populated with URL search parameters from the listing page.
-  * Displays property snapshot, cancellation policy, ground rules, and fee breakdown.
-* [x] **"My Trips" Dashboard**:
-  * Dedicated `/bookings` page displaying all user reservations with dates, total price, guest count, and status badges (*Confirmed*, *Completed*, *Cancelled*).
-* [x] **Date Blocking Persistence**:
-  * Confirmed bookings persist in SQLite and dynamically block those dates from future guest reservations.
+## 🏛️ System Architecture
+
+```mermaid
+graph TD
+    subgraph Client ["Frontend — Next.js 16 (React 19 + TypeScript + Tailwind CSS v4)"]
+        UI["UI Pages (/listing, /booking, /bookings, /profile, /wishlists)"]
+        MODALS["Interactive Modals (FilterModal, MessagesModal, WriteReviewModal, LoginModal)"]
+        THEME["Theme Provider (next-themes)"]
+        API_CLIENT["Axios API Client (client.ts)"]
+        AUTH_STORE["Local Session (JWT Token & User State)"]
+
+        THEME --> UI
+        AUTH_STORE --> API_CLIENT
+        MODALS --> API_CLIENT
+        UI --> API_CLIENT
+    end
+
+    subgraph Server ["Backend — FastAPI (Python 3.11+)"]
+        ROUTER_AUTH["/auth (Register, Login, Me)"]
+        ROUTER_LISTINGS["/listings (CRUD, Booked Dates, Filters)"]
+        ROUTER_BOOKINGS["/bookings (Overlap Validation, Host Reservations, My Trips)"]
+        ROUTER_WISHLIST["/wishlist (Save/Remove Listings)"]
+        ROUTER_REVIEWS["/reviews (Ratings & Feedback)"]
+        
+        SECURITY["JWT Bearer & Bcrypt CryptContext"]
+        ORM["SQLAlchemy ORM Models"]
+    end
+
+    subgraph Database ["Data Store"]
+        SQLITE[("SQLite Database (airclone.db)")]
+    end
+
+    API_CLIENT <==>|"REST API / JSON (Bearer JWT)"| Server
+    Server --> ORM
+    ORM --> SQLITE
+```
 
 ---
 
-### 4. 🔑 Core Feature 4: Host Experience — CRUD (Must Have)
-* [x] **Create a Listing**:
-  * Multi-step onboarding flow at `/become-a-host` to publish listings with title, description, category, photos via URL/multi-upload, price per night, location, max guests, bedrooms, beds, bathrooms, and amenities.
-* [x] **Edit and Delete Listings**:
-  * Dedicated edit page at `/listing/[id]/edit` to update listing details.
-  * Soft-delete functionality directly from host profile (`DELETE /listings/{id}`).
-* [x] **Host Reservations Dashboard ("Bookings on My Listings")**:
-  * Dedicated tab under `/profile` displaying all guest reservations made on properties owned by the host.
-  * Financial KPI metrics: Total Lifetime Earnings (₹), Total Guests Hosted, Confirmed Bookings, and Completed Trips.
-  * Search filter by guest name/email and status filter (*All, Confirmed, Completed, Cancelled*).
-* [x] **All Listing Data Persists**:
-  * Stored in SQLite via SQLAlchemy ORM models (`listings`, `bookings`, `photos`).
+## 🗄️ Database Schema & ERD
 
----
-
-### 5. 🎨 Core Feature 5: Airbnb Experience & Design (Must Have)
-* [x] **Authentic Airbnb Look & Feel**:
-  * Styled with Airbnb Cereal typography, rounded corners (`rounded-3xl`), glassmorphism headers, and Airbnb gradient brand accents (`#FF385C` to `#E00B41`).
-* [x] **Cards, Galleries, Date Pickers, and Modals**:
-  * `FilterModal` (Search filters), `MessagesModal` (Inbox), `WriteReviewModal` (Reviews), `LoginModal` (Auth), `PhotoGalleryModal` (Photos), `AmenitiesModal` (Amenities).
-* [x] **Notifications & Toasts**:
-  * Toast alerts for wishlist saves, clipboard URL copies, and review submissions.
-* [x] **Wishlists & Favorites**:
-  * Real-time heart button toggles synchronized with `/wishlist` API and dedicated `/wishlists` dashboard.
-
----
-
-### 📦 6. Mocked / Placeholder Sections (As Specified)
-* [x] **Real Payment Processing**: Mocked checkout flow on `/booking/[id]` with trip confirmation.
-* [x] **Host-Guest Messaging**:
-  * Direct "Messages" link in top navigation avatar menu with unread badge (`1`).
-  * Opens an authentic **Host Inbox & Messaging Modal (`MessagesModal`)** with conversation threads (Goa Villa host, Noida 2BHK host, Support), real-time thread search, response rates, and message composer.
-* [x] **Real-Time Map with Live Pricing Pins**:
-  * Interactive Leaflet map with custom pricing pills on homepage (`SplitMapView`) and listing detail pages.
-* [x] **Identity Verification**:
-  * **Identity Verified ✓** badges on host cards, listing headers, and profile sidebar trust card (*Government ID verified, Email confirmed, Phone confirmed*).
-* [x] **User Authentication (Guest vs Host)**:
-  * JWT Bearer authentication with registration (`POST /auth/register`), login (`POST /auth/login`), and role management.
-
----
-
-### 🎁 7. Bonus (Optional) Features — ALL IMPLEMENTED
-* [x] **Interactive Map with Listing Pins**: Interactive Leaflet split-view with synchronized hover and click highlights.
-* [x] **Leave a Review After a Completed Stay**: Interactive **Write a Review Modal** on `/bookings` with 5-star category ratings and persistent feedback badges.
-* [x] **Superhost Badges & Ratings Aggregation**: Superhost laurel badges, review averages, and ratings breakdown.
-* [x] **Image Upload / Multi-Photo URLs**: Multi-image gallery arrays and image upload handlers.
-* [x] **Dark / Night Mode**: Seamless theme switcher (Sun ☀️ / Moon 🌙) with dark surfaces (`#121212`, `#181818`, `#242424`) and `localStorage` persistence.
-* [x] **Responsive Design**: Mobile drawers, full-screen mobile search modals, tablet grids, and desktop layouts.
-
----
-
-## 🗄️ Database Schema & Design
-
-The application uses an SQLite relational database (`airclone.db`) managed through SQLAlchemy ORM models.
+The application utilizes an SQLite database (`airclone.db`) managed through SQLAlchemy ORM models.
 
 ```mermaid
 erDiagram
@@ -221,24 +181,6 @@ erDiagram
     }
 ```
 
-### Table Definitions:
-1. **`users`**: Manages guest and host credentials, bcrypt hashed passwords, and host privilege flags.
-2. **`listings`**: Stores property metadata, pricing, capacity, geolocation coordinates, and serialized amenities.
-3. **`photos`**: Ordered gallery images associated with listings.
-4. **`bookings`**: Stores reservation records, date ranges, guest counts, total calculated prices, and lifecycle status (`CONFIRMED`, `COMPLETED`, `CANCELLED`).
-5. **`wishlists`**: User-saved favorite properties.
-6. **`reviews`**: Verified star ratings and commentary.
-
----
-
-## 🤔 Assumptions Made
-
-1. **Currency**: All rates and calculations are in Indian Rupees (**₹ INR**).
-2. **Date Granularity**: Stays are calculated per night (`check_out - check_in`). Check-out is the departure morning, meaning that date is available for a new check-in that same afternoon.
-3. **Fee Structure**: Standard fee formula consists of base nightly rate $\times$ nights + ₹500 cleaning fee + 12% AirClone service fee.
-4. **Authentication**: JWT tokens expire after 7 days and are stored client-side in `localStorage` with automated Axios request interceptors. Unauthenticated users can freely explore, search, filter, and view listings; attempting to book or manage listings opens the in-page Auth Modal.
-5. **Payment**: Checkout is mocked for assessment purposes; clicking "Confirm & Pay" creates a verified `CONFIRMED` booking in the database.
-
 ---
 
 ## 🛠️ Technology Stack
@@ -249,7 +191,7 @@ erDiagram
 | **Next.js** | `16.1.4` (App Router) | React Framework with Turbopack |
 | **React** | `19.0.0` | UI Component Architecture |
 | **TypeScript** | `5.x` | Static Type Safety |
-| **Tailwind CSS** | `4.x` | Modern Utility-First Styling with Dark Mode |
+| **Tailwind CSS** | `4.x` | Modern Styling with Custom Dark Mode Variants |
 | **next-themes** | `0.4.4` | Dark/Light Theme Provider & Persistence |
 | **Lucide React** | Latest | Airbnb-Style Vector Icons |
 | **Leaflet & React-Leaflet** | Latest | Interactive Map Visualization |
@@ -285,7 +227,7 @@ Interactive Swagger documentation is available at `http://localhost:8000/docs`.
 | :--- | :--- | :--- | :---: |
 | `GET` | `/listings/` | List active listings with location, price, guests, and type filters | No |
 | `GET` | `/listings/{id}` | Get single listing with photos and amenities | No |
-| `GET` | `/listings/{id}/booked-dates` | **Fetch confirmed booked date ranges for calendar blocking** | No |
+| `GET` | `/listings/{id}/booked-dates` | Fetch confirmed booked date ranges for calendar blocking | No |
 | `POST` | `/listings/` | Create a new property listing | Yes |
 | `PUT` | `/listings/{id}` | Update listing details (Owner only) | Yes |
 | `DELETE` | `/listings/{id}` | Soft-delete listing (`is_active = 0`) | Yes |
@@ -295,7 +237,7 @@ Interactive Swagger documentation is available at `http://localhost:8000/docs`.
 | :--- | :--- | :--- | :---: |
 | `POST` | `/bookings/` | Validate date conflicts & create reservation | Yes |
 | `GET` | `/bookings/me` | List current user's booked trips | Yes |
-| `GET` | `/bookings/host-reservations` | **List all reservations on properties owned by the host** | Yes |
+| `GET` | `/bookings/host-reservations` | List all reservations on properties owned by the host | Yes |
 | `PATCH` | `/bookings/{id}/status` | Update booking status (`CONFIRMED`, `CANCELLED`) | Yes |
 
 ### ❤️ Wishlists (`/wishlist`)
@@ -376,7 +318,7 @@ npm run dev
 
 ---
 
-## 🧪 Evaluator & Testing User Flow Guide
+## 🧪 Testing the Complete User Flow
 
 1. **Explore & Search:**
    * Open the **Global Search Bar**: test autosuggest for "Goa" or "Noida".
