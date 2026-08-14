@@ -24,6 +24,9 @@ import {
   Eye,
   Calendar as CalendarIcon,
   Award,
+  KeyRound,
+  MessageSquare,
+  Tag,
 } from "lucide-react";
 
 import Header from "@/components/layout/header";
@@ -187,6 +190,19 @@ export default function ListingDetailPage() {
     router.push(
       `/booking/${listing.id}?checkIn=${checkInDate}&checkOut=${checkOutDate}&guests=${guestCount}`
     );
+  };
+
+  const renderAmenityIcon = (name: string) => {
+    const n = name.toLowerCase();
+    if (n.includes("kitchen") || n.includes("cook")) return <Utensils size={20} />;
+    if (n.includes("wifi") || n.includes("internet")) return <Wifi size={20} />;
+    if (n.includes("tv")) return <Tv size={20} />;
+    if (n.includes("park") || n.includes("car")) return <Car size={20} />;
+    if (n.includes("air") || n.includes("cool") || n.includes("fan")) return <Wind size={20} />;
+    if (n.includes("coffee") || n.includes("kettle")) return <Coffee size={20} />;
+    if (n.includes("alarm") || n.includes("smoke") || n.includes("safe")) return <ShieldCheck size={20} />;
+    if (n.includes("view") || n.includes("patio") || n.includes("balcony")) return <Eye size={20} />;
+    return <Sparkles size={20} />;
   };
 
   return (
@@ -436,8 +452,8 @@ export default function ListingDetailPage() {
             {listing.isGuestFavorite && (
               <div className="p-6 rounded-2xl border border-gray-200 dark:border-[#2a2a2a] bg-gray-50/50 dark:bg-[#1a1a1a] flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl shrink-0">
-                    🏆
+                  <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <Award size={24} />
                   </div>
                   <div>
                     <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
@@ -454,7 +470,11 @@ export default function ListingDetailPage() {
                     {listing.rating.toFixed(2)}
                   </div>
                   <div className="flex items-center justify-end gap-0.5 text-xs text-amber-500">
-                    {"★★★★★"}
+                    <Star size={12} className="fill-amber-500 text-amber-500" />
+                    <Star size={12} className="fill-amber-500 text-amber-500" />
+                    <Star size={12} className="fill-amber-500 text-amber-500" />
+                    <Star size={12} className="fill-amber-500 text-amber-500" />
+                    <Star size={12} className="fill-amber-500 text-amber-500" />
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 underline font-semibold mt-1">
                     {listing.reviewCount} Reviews
@@ -467,7 +487,15 @@ export default function ListingDetailPage() {
             <div className="space-y-6 pb-8 border-b border-gray-200 dark:border-[#2a2a2a]">
               {listing.highlights.map((h, i) => (
                 <div key={i} className="flex items-start gap-4">
-                  <span className="text-2xl shrink-0 mt-0.5">{h.icon}</span>
+                  <div className="p-2 rounded-xl bg-gray-100 dark:bg-[#252525] text-gray-900 dark:text-gray-100 shrink-0 mt-0.5">
+                    {h.title.toLowerCase().includes("top 5%") ? (
+                      <Award size={20} className="text-amber-500" />
+                    ) : h.title.toLowerCase().includes("cool") ? (
+                      <Wind size={20} className="text-blue-500" />
+                    ) : (
+                      <KeyRound size={20} className="text-emerald-500" />
+                    )}
+                  </div>
                   <div>
                     <h4 className="font-bold text-gray-900 dark:text-white">
                       {h.title}
@@ -520,16 +548,16 @@ export default function ListingDetailPage() {
                 {listing.bedroomsDetail.map((bed, idx) => (
                   <div
                     key={idx}
-                    className="border border-gray-200 dark:border-[#2a2a2a] rounded-2xl p-4 bg-white dark:bg-[#1a1a1a] shadow-sm hover:shadow-md transition"
+                    className="border border-gray-200 dark:border-[#2a2a2a] rounded-2xl p-4 bg-white dark:bg-[#1e1e1e]"
                   >
-                    <div className="aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 dark:bg-[#222222] mb-3">
+                    <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-gray-100 dark:bg-[#252525]">
                       <img
                         src={bed.image}
                         alt={bed.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">
+                    <h4 className="font-bold text-sm text-gray-900 dark:text-white">
                       {bed.name}
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -546,24 +574,26 @@ export default function ListingDetailPage() {
                 What this place offers
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {listing.amenities
-                  .flatMap((c) => c.items)
+                  .flatMap((cat) => cat.items)
                   .slice(0, 10)
-                  .map((amenity, idx) => (
+                  .map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 text-gray-800 dark:text-gray-200"
+                      className="flex items-center gap-4 text-gray-800 dark:text-gray-200 py-1"
                     >
-                      <span className="text-xl">{amenity.icon}</span>
-                      <span className="text-base">{amenity.name}</span>
+                      <div className="text-gray-700 dark:text-gray-300">
+                        {renderAmenityIcon(item.name)}
+                      </div>
+                      <span className="text-base">{item.name}</span>
                     </div>
                   ))}
               </div>
 
               <button
                 onClick={() => setAmenitiesModalOpen(true)}
-                className="mt-8 px-6 py-3 border border-gray-900 dark:border-white rounded-xl font-bold text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition"
+                className="mt-6 px-6 py-3 border border-black dark:border-white rounded-xl font-bold text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#222222] transition"
               >
                 Show all 35 amenities
               </button>
@@ -571,15 +601,15 @@ export default function ListingDetailPage() {
 
             {/* 2-MONTH INTERACTIVE CALENDAR (IMAGE 4) */}
             <div className="pb-8 border-b border-gray-200 dark:border-[#2a2a2a]">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                2 nights in {listing.city}
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                2 nights in Noida
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                 28 Aug 2026 – 30 Aug 2026
               </p>
 
               {/* Side-by-side Calendar Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl p-6 bg-gray-50/50 dark:bg-[#181818]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl p-6 bg-white dark:bg-[#1a1a1a]">
                 {/* August 2026 */}
                 <div>
                   <h4 className="font-bold text-center text-gray-900 dark:text-white mb-4">
@@ -656,7 +686,9 @@ export default function ListingDetailPage() {
             {/* REVIEWS & RATINGS BREAKDOWN (IMAGE 5) */}
             <div className="pb-8 border-b border-gray-200 dark:border-[#2a2a2a]" id="reviews">
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl">🏆</span>
+                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <Award size={22} />
+                </div>
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Guest favourite
@@ -677,7 +709,7 @@ export default function ListingDetailPage() {
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                     {listing.ratingsBreakdown.cleanliness}
                   </p>
-                  <span className="text-2xl">🧼</span>
+                  <Sparkles size={22} className="mx-auto text-gray-700 dark:text-gray-300 mt-2" />
                 </div>
                 <div className="border-r border-gray-200 dark:border-[#2a2a2a] pr-2">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -686,7 +718,7 @@ export default function ListingDetailPage() {
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                     {listing.ratingsBreakdown.accuracy}
                   </p>
-                  <span className="text-2xl">✅</span>
+                  <Check size={22} className="mx-auto text-gray-700 dark:text-gray-300 mt-2" />
                 </div>
                 <div className="border-r border-gray-200 dark:border-[#2a2a2a] pr-2">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -695,7 +727,7 @@ export default function ListingDetailPage() {
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                     {listing.ratingsBreakdown.checkIn}
                   </p>
-                  <span className="text-2xl">🔑</span>
+                  <KeyRound size={22} className="mx-auto text-gray-700 dark:text-gray-300 mt-2" />
                 </div>
                 <div className="border-r border-gray-200 dark:border-[#2a2a2a] pr-2">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -704,7 +736,7 @@ export default function ListingDetailPage() {
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                     {listing.ratingsBreakdown.communication}
                   </p>
-                  <span className="text-2xl">💬</span>
+                  <MessageSquare size={22} className="mx-auto text-gray-700 dark:text-gray-300 mt-2" />
                 </div>
                 <div className="border-r border-gray-200 dark:border-[#2a2a2a] pr-2">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -713,7 +745,7 @@ export default function ListingDetailPage() {
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                     {listing.ratingsBreakdown.location}
                   </p>
-                  <span className="text-2xl">🗺️</span>
+                  <MapPin size={22} className="mx-auto text-gray-700 dark:text-gray-300 mt-2" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -722,7 +754,7 @@ export default function ListingDetailPage() {
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                     {listing.ratingsBreakdown.value}
                   </p>
-                  <span className="text-2xl">🏷️</span>
+                  <Tag size={22} className="mx-auto text-gray-700 dark:text-gray-300 mt-2" />
                 </div>
               </div>
 

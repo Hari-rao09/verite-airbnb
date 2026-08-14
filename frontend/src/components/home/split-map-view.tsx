@@ -11,6 +11,8 @@ import {
   SlidersHorizontal,
   MapPin,
   Sparkles,
+  Tag,
+  Award,
 } from "lucide-react";
 
 const AirbnbMap = dynamic(() => import("@/components/map/airbnb-map"), {
@@ -139,8 +141,9 @@ export default function SplitMapView({
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 text-xs font-semibold py-1.5 px-3 bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 rounded-full border border-pink-100 dark:border-pink-900/40">
-            🏷️ Prices include all fees
+          <div className="flex items-center gap-1.5 text-xs font-semibold py-1.5 px-3 bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 rounded-full border border-pink-100 dark:border-pink-900/40">
+            <Tag size={13} className="text-pink-600 dark:text-pink-400" />
+            Prices include all fees
           </div>
 
           <div className="flex items-center gap-2">
@@ -188,8 +191,9 @@ export default function SplitMapView({
 
                 {/* GUEST FAVOURITE BADGE */}
                 {pinnedStay.isGuestFavorite && (
-                  <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1 border border-gray-100 dark:border-[#333333]">
-                    🏆 Guest favourite
+                  <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5 border border-gray-100 dark:border-[#333333]">
+                    <Award size={13} className="text-amber-500" />
+                    Guest favourite
                   </div>
                 )}
 

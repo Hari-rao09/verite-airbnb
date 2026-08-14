@@ -214,11 +214,6 @@ export default function AirbnbMap({
           −
         </button>
       </div>
-
-      {/* BOTTOM BRANDING WATERMARK */}
-      <div className="absolute bottom-3 left-3 z-[400] bg-white/90 dark:bg-[#1e1e1e]/90 backdrop-blur-sm px-2.5 py-1 rounded-md text-[11px] font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#333333]">
-        📍 AirClone Interactive Map
-      </div>
     </div>
   );
 }

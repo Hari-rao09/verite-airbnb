@@ -19,6 +19,8 @@ import {
   Minus,
   ArrowRight,
   Map as MapIcon,
+  List,
+  Tag,
 } from "lucide-react";
 
 type Stay = {
@@ -1071,8 +1073,30 @@ export default function HomePage() {
             </button>
 
             <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 rounded-3xl bg-pink-50 dark:bg-pink-950/40 border border-pink-100 dark:border-pink-900/30 flex items-center justify-center text-4xl shadow-inner">
-                🏷️
+              <div className="w-20 h-20 rounded-3xl bg-[#FFF3EE] dark:bg-[#2a1d17] border border-[#FFE0B2]/60 dark:border-[#5a3a2a] flex items-center justify-center shadow-inner">
+                <svg
+                  width="44"
+                  height="44"
+                  viewBox="0 0 48 48"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M21.5 8.5L8.5 21.5L26.5 39.5L39.5 26.5L21.5 8.5Z"
+                    fill="#FFA500"
+                    stroke="#FF7A00"
+                    strokeWidth="2.5"
+                    strokeLinejoin="round"
+                  />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="3.5"
+                    fill="#E65100"
+                    stroke="#FFE0B2"
+                    strokeWidth="1.5"
+                  />
+                </svg>
               </div>
             </div>
 
@@ -1443,7 +1467,7 @@ export default function HomePage() {
           {showMapSplit ? (
             <>
               <span>Show list</span>
-              <span>📋</span>
+              <List size={16} />
             </>
           ) : (
             <>
