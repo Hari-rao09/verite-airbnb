@@ -19,6 +19,7 @@ import {
   Minus,
   ArrowRight,
   Map as MapIcon,
+  List,
   Tag,
   SlidersHorizontal,
 } from "lucide-react";
