@@ -711,8 +711,25 @@ export default function HomePage() {
   const [selectedRegion, setSelectedRegion] = useState("India");
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
 
-  const [promoOpen, setPromoOpen] = useState(true);
+  const [promoMounted, setPromoMounted] = useState(true);
+  const [promoVisible, setPromoVisible] = useState(false);
   const [showMapSplit, setShowMapSplit] = useState(false);
+
+  useEffect(() => {
+    // Smooth entrance transition from bottom to center on page land
+    const timer = setTimeout(() => {
+      setPromoVisible(true);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const closePromo = () => {
+    // Smooth exit transition from center to bottom
+    setPromoVisible(false);
+    setTimeout(() => {
+      setPromoMounted(false);
+    }, 400);
+  };
 
   const [favorites, setFavorites] = useState<number[]>([]);
 
@@ -1025,47 +1042,55 @@ export default function HomePage() {
       />
 
       {/* ==================================================
-          PROMOTIONAL POPUP
+          PROMOTIONAL POPUP WITH FLUID BOTTOM-TO-CENTER ANIMATION
       ================================================== */}
 
-      {promoOpen && (
-        <div className="fixed inset-0 z-[90] bg-black/30 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
-
-          <div className="bg-white dark:bg-[#1e1e1e] rounded-[28px] shadow-2xl border border-gray-100 dark:border-[#333333] max-w-[430px] w-full p-8 relative text-gray-900 dark:text-gray-100">
-
+      {promoMounted && (
+        <div
+          onClick={closePromo}
+          className={`fixed inset-0 z-[90] flex items-center justify-center px-4 airbnb-backdrop-fade ${
+            promoVisible
+              ? "bg-black/40 dark:bg-black/70 backdrop-blur-md opacity-100"
+              : "bg-transparent backdrop-blur-none opacity-0 pointer-events-none"
+          }`}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-white dark:bg-[#1e1e1e] rounded-[32px] shadow-2xl border border-gray-100 dark:border-[#333333] max-w-[420px] w-full p-8 relative text-gray-900 dark:text-gray-100 airbnb-modal-spring will-change-transform ${
+              promoVisible
+                ? "translate-y-0 scale-100 opacity-100"
+                : "translate-y-28 scale-90 opacity-0"
+            }`}
+          >
             <button
-              onClick={() => setPromoOpen(false)}
-              className="absolute right-5 top-5 w-9 h-9 rounded-full hover:bg-gray-100 dark:hover:bg-[#2c2c2c] flex items-center justify-center text-gray-600 dark:text-gray-300"
+              onClick={closePromo}
+              className="absolute right-5 top-5 w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-[#2c2c2c] flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
+              aria-label="Close"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
             <div className="flex justify-center mb-6">
-
-              <div className="w-20 h-20 rounded-2xl bg-[#FF385C]/10 flex items-center justify-center text-5xl">
+              <div className="w-20 h-20 rounded-3xl bg-pink-50 dark:bg-pink-950/40 border border-pink-100 dark:border-pink-900/30 flex items-center justify-center text-4xl shadow-inner">
                 🏷️
               </div>
-
             </div>
 
-            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white tracking-tight">
               One simple price
             </h2>
 
-            <p className="text-gray-600 dark:text-gray-300 text-center mt-3 leading-relaxed">
-              See one price for your trip,
-              with all fees included.
+            <p className="text-gray-600 dark:text-gray-300 text-center mt-2.5 leading-relaxed text-sm">
+              See one price for your trip, with all fees included.
             </p>
 
             <button
-              onClick={() => setPromoOpen(false)}
-              className="mt-7 w-full bg-[#222222] dark:bg-white text-white dark:text-black py-4 rounded-xl font-semibold hover:bg-black dark:hover:bg-gray-100 transition"
+              onClick={closePromo}
+              className="mt-7 w-full bg-[#222222] dark:bg-white text-white dark:text-black py-3.5 rounded-2xl font-bold text-base hover:bg-black dark:hover:bg-gray-100 hover:scale-[1.01] active:scale-[0.98] transition duration-200 shadow-md"
             >
               Got it
             </button>
-
           </div>
-
         </div>
       )}
 
