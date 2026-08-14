@@ -76,6 +76,10 @@ export default function ListingDetailPage() {
   const [guestCount, setGuestCount] = useState(2);
   const [guestDropdownOpen, setGuestDropdownOpen] = useState(false);
 
+  // Backend Booked Date Ranges & Calendar state
+  const [bookedRanges, setBookedRanges] = useState<{ id: number; check_in: string; check_out: string }[]>([]);
+  const [calendarMonthOffset, setCalendarMonthOffset] = useState(0);
+
   // Active section for sticky sub-nav
   const [activeSection, setActiveSection] = useState("photos");
   const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
@@ -111,6 +115,16 @@ export default function ListingDetailPage() {
     };
 
     fetchListing();
+
+    // Fetch confirmed booked dates for dynamic calendar blocking
+    propertiesApi
+      .getBookedDates(listingId)
+      .then((data) => {
+        if (data && Array.isArray(data)) {
+          setBookedRanges(data);
+        }
+      })
+      .catch(() => {});
 
     // Check wishlist status
     const token = localStorage.getItem("token");
@@ -178,15 +192,151 @@ export default function ListingDetailPage() {
     }
   };
 
-  // Price calculation
-  const nights = 2;
+  // Check if a specific YYYY-MM-DD date string is reserved/booked
+  const isDateBooked = (dateStr: string) => {
+    return bookedRanges.some((range) => {
+      return dateStr >= range.check_in && dateStr < range.check_out;
+    });
+  };
+
+  // Check if selected booking range conflicts with any booked dates
+  const isRangeConflicting = useMemo(() => {
+    if (!checkInDate || !checkOutDate || checkInDate >= checkOutDate) return false;
+    return bookedRanges.some((range) => {
+      return checkInDate < range.check_out && checkOutDate > range.check_in;
+    });
+  }, [checkInDate, checkOutDate, bookedRanges]);
+
+  // Dynamic Price & Night duration calculation
+  const nights = useMemo(() => {
+    if (!checkInDate || !checkOutDate) return 2;
+    const d1 = new Date(checkInDate);
+    const d2 = new Date(checkOutDate);
+    const diff = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 1;
+  }, [checkInDate, checkOutDate]);
+
   const basePrice = listing.pricePerNight * nights;
   const originalPrice = (listing.originalPricePerNight || listing.pricePerNight * 2) * nights;
   const cleaningFee = 500;
   const serviceFee = Math.round(basePrice * 0.12);
   const totalPrice = basePrice + cleaningFee + serviceFee;
 
+  const handleDateClick = (dateStr: string) => {
+    if (isDateBooked(dateStr)) return;
+
+    if (!checkInDate || (checkInDate && checkOutDate)) {
+      setCheckInDate(dateStr);
+      setCheckOutDate("");
+    } else if (checkInDate && !checkOutDate) {
+      if (dateStr <= checkInDate) {
+        setCheckInDate(dateStr);
+      } else {
+        // Check if any date in between is booked
+        const start = new Date(checkInDate);
+        const end = new Date(dateStr);
+        let hasBlocked = false;
+        for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          if (isDateBooked(`${y}-${m}-${day}`)) {
+            hasBlocked = true;
+            break;
+          }
+        }
+        if (hasBlocked) {
+          setCheckInDate(dateStr);
+        } else {
+          setCheckOutDate(dateStr);
+        }
+      }
+    }
+  };
+
+  const formatDateDisplay = (dateStr: string) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  };
+
+  // Calendar Month targets
+  const month1Date = useMemo(() => {
+    const base = new Date();
+    base.setMonth(base.getMonth() + calendarMonthOffset);
+    return base;
+  }, [calendarMonthOffset]);
+
+  const month2Date = useMemo(() => {
+    const base = new Date();
+    base.setMonth(base.getMonth() + calendarMonthOffset + 1);
+    return base;
+  }, [calendarMonthOffset]);
+
+  const renderMonthCalendar = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const monthName = date.toLocaleString("default", { month: "long", year: "numeric" });
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+    return (
+      <div key={monthName} className="select-none">
+        <h4 className="font-bold text-center text-sm text-gray-900 dark:text-white mb-4">
+          {monthName}
+        </h4>
+        <div className="grid grid-cols-7 text-center text-xs font-semibold text-gray-400 mb-2">
+          {weekdays.map((w) => (
+            <span key={w}>{w}</span>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 text-center text-xs gap-y-1">
+          {Array.from({ length: firstDayIndex }).map((_, i) => (
+            <span key={`empty-${i}`} className="p-2" />
+          ))}
+          {Array.from({ length: totalDays }, (_, i) => {
+            const day = i + 1;
+            const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            const isBooked = isDateBooked(dateStr);
+            const isStart = checkInDate === dateStr;
+            const isEnd = checkOutDate === dateStr;
+            const isInRange = checkInDate && checkOutDate && dateStr > checkInDate && dateStr < checkOutDate;
+
+            let dayClasses = "rounded-full cursor-pointer transition text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-[#333]";
+
+            if (isBooked) {
+              dayClasses = "line-through text-gray-300 dark:text-gray-600 bg-gray-50/60 dark:bg-[#252525]/60 cursor-not-allowed font-normal";
+            } else if (isStart || isEnd) {
+              dayClasses = "bg-black dark:bg-white text-white dark:text-black font-bold rounded-full shadow-sm";
+            } else if (isInRange) {
+              dayClasses = "bg-gray-100 dark:bg-[#2c2c2c] text-gray-900 dark:text-white font-semibold rounded-none";
+            }
+
+            return (
+              <button
+                key={dateStr}
+                type="button"
+                disabled={isBooked}
+                onClick={() => handleDateClick(dateStr)}
+                title={isBooked ? "Reserved / Unavailable" : dateStr}
+                className={`w-full aspect-square flex items-center justify-center text-xs font-semibold ${dayClasses}`}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const handleReserve = () => {
+    if (isRangeConflicting) {
+      alert("Selected dates conflict with an existing reservation. Please pick available dates.");
+      return;
+    }
     router.push(
       `/booking/${listing.id}?checkIn=${checkInDate}&checkOut=${checkOutDate}&guests=${guestCount}`
     );
@@ -599,85 +749,86 @@ export default function ListingDetailPage() {
               </button>
             </div>
 
-            {/* 2-MONTH INTERACTIVE CALENDAR (IMAGE 4) */}
-            <div className="pb-8 border-b border-gray-200 dark:border-[#2a2a2a]">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                2 nights in Noida
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                28 Aug 2026 – 30 Aug 2026
-              </p>
-
-              {/* Side-by-side Calendar Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border border-gray-200 dark:border-[#2a2a2a] rounded-2xl p-6 bg-white dark:bg-[#1a1a1a]">
-                {/* August 2026 */}
+            {/* 2-MONTH INTERACTIVE CALENDAR WITH BACKEND DATE BLOCKING */}
+            <div className="pb-8 border-b border-gray-200 dark:border-[#2a2a2a]" id="calendar">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                 <div>
-                  <h4 className="font-bold text-center text-gray-900 dark:text-white mb-4">
-                    August 2026
-                  </h4>
-                  <div className="grid grid-cols-7 text-center text-xs font-semibold text-gray-400 mb-2">
-                    <span>S</span>
-                    <span>M</span>
-                    <span>T</span>
-                    <span>W</span>
-                    <span>T</span>
-                    <span>F</span>
-                    <span>S</span>
-                  </div>
-                  <div className="grid grid-cols-7 text-center text-sm gap-1">
-                    <span className="p-2 text-transparent">0</span>
-                    <span className="p-2 text-transparent">0</span>
-                    <span className="p-2 text-transparent">0</span>
-                    <span className="p-2 text-transparent">0</span>
-                    <span className="p-2 text-transparent">0</span>
-                    <span className="p-2 text-transparent">0</span>
-                    <span className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#333]">
-                      1
-                    </span>
-                    {Array.from({ length: 26 }, (_, i) => i + 2).map((day) => {
-                      const isSelected = day >= 28 && day <= 30;
-                      return (
-                        <span
-                          key={day}
-                          className={`p-2 rounded-full cursor-pointer transition ${
-                            isSelected
-                              ? "bg-black dark:bg-white text-white dark:text-black font-bold"
-                              : "hover:bg-gray-200 dark:hover:bg-[#333]"
-                          }`}
-                        >
-                          {day}
-                        </span>
-                      );
-                    })}
-                    <span className="p-2 text-transparent">0</span>
-                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {checkInDate && checkOutDate
+                      ? `${nights} night${nights > 1 ? "s" : ""} in ${listing.location}`
+                      : "Select check-in & check-out dates"}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {checkInDate && checkOutDate
+                      ? `${formatDateDisplay(checkInDate)} – ${formatDateDisplay(checkOutDate)}`
+                      : "Add your travel dates for exact pricing and availability"}
+                  </p>
                 </div>
 
-                {/* September 2026 */}
-                <div>
-                  <h4 className="font-bold text-center text-gray-900 dark:text-white mb-4">
-                    September 2026
-                  </h4>
-                  <div className="grid grid-cols-7 text-center text-xs font-semibold text-gray-400 mb-2">
-                    <span>S</span>
-                    <span>M</span>
-                    <span>T</span>
-                    <span>W</span>
-                    <span>T</span>
-                    <span>F</span>
-                    <span>S</span>
+                {(checkInDate || checkOutDate) && (
+                  <button
+                    onClick={() => {
+                      setCheckInDate("");
+                      setCheckOutDate("");
+                    }}
+                    className="text-xs font-bold underline text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white self-start sm:self-auto"
+                  >
+                    Clear dates
+                  </button>
+                )}
+              </div>
+
+              {/* Conflict warning banner */}
+              {isRangeConflicting && (
+                <div className="mb-4 p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>Selected dates overlap with an existing reservation. Please pick available dates.</span>
+                </div>
+              )}
+
+              {/* Side-by-side 2-Month Calendar */}
+              <div className="border border-gray-200 dark:border-[#2a2a2a] rounded-3xl p-6 bg-white dark:bg-[#1a1a1a] shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    onClick={() => setCalendarMonthOffset((prev) => Math.max(0, prev - 1))}
+                    disabled={calendarMonthOffset === 0}
+                    className="w-9 h-9 rounded-full border border-gray-200 dark:border-[#333] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:border-black dark:hover:border-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                    aria-label="Previous months"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+                    Live availability synced with database
+                  </span>
+
+                  <button
+                    onClick={() => setCalendarMonthOffset((prev) => prev + 1)}
+                    className="w-9 h-9 rounded-full border border-gray-200 dark:border-[#333] flex items-center justify-center text-gray-700 dark:text-gray-300 hover:border-black dark:hover:border-white transition"
+                    aria-label="Next months"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  {renderMonthCalendar(month1Date)}
+                  {renderMonthCalendar(month2Date)}
+                </div>
+
+                {/* Calendar Legend */}
+                <div className="flex flex-wrap items-center gap-6 mt-6 pt-4 border-t border-gray-100 dark:border-[#282828] text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3.5 h-3.5 rounded-full bg-black dark:bg-white" />
+                    <span>Selected</span>
                   </div>
-                  <div className="grid grid-cols-7 text-center text-sm gap-1">
-                    <span className="p-2 text-transparent">0</span>
-                    <span className="p-2 text-transparent">0</span>
-                    {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => (
-                      <span
-                        key={day}
-                        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#333] cursor-pointer"
-                      >
-                        {day}
-                      </span>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <span className="w-3.5 h-3.5 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a1a]" />
+                    <span>Available</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3.5 h-3.5 rounded-full bg-gray-200 dark:bg-[#333] flex items-center justify-center text-[9px] line-through text-gray-500">12</span>
+                    <span>Reserved / Blocked</span>
                   </div>
                 </div>
               </div>
@@ -945,12 +1096,20 @@ export default function ListingDetailPage() {
                 ✓ Free cancellation before 27 August
               </p>
 
+              {/* CONFLICT WARNING IN WIDGET */}
+              {isRangeConflicting && (
+                <div className="mb-4 p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-300 text-[11px] font-semibold text-center">
+                  ⚠️ Dates unavailable (already booked)
+                </div>
+              )}
+
               {/* RESERVE BUTTON */}
               <button
                 onClick={handleReserve}
-                className="w-full bg-gradient-to-r from-[#FF385C] via-[#E00B41] to-[#D70466] text-white py-3.5 rounded-xl font-bold text-base shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2"
+                disabled={isRangeConflicting || !checkInDate || !checkOutDate}
+                className="w-full bg-gradient-to-r from-[#FF385C] via-[#E00B41] to-[#D70466] text-white py-3.5 rounded-xl font-bold text-base shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Reserve
+                {isRangeConflicting ? "Dates Unavailable" : "Reserve"}
               </button>
 
               <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3">

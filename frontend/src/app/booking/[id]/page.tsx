@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Star } from "lucide-react";
 
 import { apiClient } from "@/lib/api/client";
@@ -25,12 +25,13 @@ interface Listing {
 export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [listing, setListing] = useState<Listing | null>(null);
 
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(1);
+  const [checkIn, setCheckIn] = useState(searchParams.get("checkIn") || "");
+  const [checkOut, setCheckOut] = useState(searchParams.get("checkOut") || "");
+  const [guests, setGuests] = useState(Number(searchParams.get("guests")) || 1);
 
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);

@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Listing, User, ListingPhoto
+from app.models import Listing, User, ListingPhoto, Booking
 from app.schemas.listing import ListingCreate, ListingResponse
+from app.schemas.booking import BookedDateRange
 from app.security import get_current_user
 
 
@@ -40,6 +41,37 @@ def create_listing(
         **new_listing.__dict__,
         "photos": []
     }
+
+
+@router.get("/{listing_id}/booked-dates", response_model=list[BookedDateRange])
+def get_listing_booked_dates(
+    listing_id: int,
+    db: Session = Depends(get_db)
+):
+    listing = db.query(Listing).filter(
+        Listing.id == listing_id,
+        Listing.is_active == 1
+    ).first()
+
+    if not listing:
+        raise HTTPException(
+            status_code=404,
+            detail="Listing not found"
+        )
+
+    bookings = db.query(Booking).filter(
+        Booking.listing_id == listing_id,
+        Booking.status == "confirmed"
+    ).all()
+
+    return [
+        {
+            "id": b.id,
+            "check_in": b.check_in,
+            "check_out": b.check_out
+        }
+        for b in bookings
+    ]
 
 
 @router.get("/", response_model=list[ListingResponse])

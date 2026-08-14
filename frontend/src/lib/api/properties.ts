@@ -78,10 +78,16 @@ export const propertiesApi = {
     return response.data;
   },
   delete: async (id: string) => {
-  const response = await apiClient.delete(
-    `/listings/${id}`
-  );
+    const response = await apiClient.delete(
+      `/listings/${id}`
+    );
 
-  return response.data;
-},
+    return response.data;
+  },
+  getBookedDates: async (id: string | number) => {
+    const response = await apiClient.get<{ id: number; check_in: string; check_out: string }[]>(
+      `/listings/${id}/booked-dates`
+    );
+    return response.data || [];
+  },
 };

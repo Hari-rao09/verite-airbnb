@@ -24,6 +24,15 @@ class BookingResponse(BaseModel):
         from_attributes = True
 
 
+class BookedDateRange(BaseModel):
+    id: int
+    check_in: date
+    check_out: date
+
+    class Config:
+        from_attributes = True
+
+
 class HostListingInfo(BaseModel):
     id: int
     title: str
