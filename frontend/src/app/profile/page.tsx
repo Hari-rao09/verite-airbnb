@@ -25,6 +25,7 @@ import {
   ShieldCheck,
   Award,
   Sparkles,
+  CheckCheck,
 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { propertiesApi } from "@/lib/api/properties";
@@ -300,6 +301,31 @@ export default function ProfilePage() {
                 </a>
               </nav>
 
+              {/* Identity Verification Card */}
+              <div className="p-5 rounded-3xl border border-gray-200 dark:border-[#2a2a2a] bg-white dark:bg-[#181818] space-y-3 shadow-sm">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Identity Verified ✓</span>
+                </div>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                  {name}&apos;s verified info
+                </h4>
+                <ul className="text-xs space-y-2.5 text-gray-600 dark:text-gray-400">
+                  <li className="flex items-center gap-2">
+                    <CheckCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Government ID verified</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Email address confirmed</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Phone number confirmed</span>
+                  </li>
+                </ul>
+              </div>
+
               {/* Host Quick Status Card */}
               <div className="p-5 rounded-3xl border border-gray-200 dark:border-[#2a2a2a] bg-gradient-to-br from-gray-50 to-white dark:from-[#181818] dark:to-[#1e1e1e] space-y-3 shadow-sm">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-500">
@@ -342,7 +368,7 @@ export default function ProfilePage() {
                           {name}
                         </h2>
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                          <ShieldCheck className="w-3.5 h-3.5" /> Verified
+                          <ShieldCheck className="w-3.5 h-3.5" /> Identity Verified ✓
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">

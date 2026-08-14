@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import LoginModal from "@/components/auth/login-modal";
+import MessagesModal from "@/components/shared/messages-modal";
 
 import Logo from "../shared/logo";
 import SearchBar from "./searchBar";
@@ -42,6 +43,7 @@ const Header = ({
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
     const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
@@ -458,9 +460,20 @@ const Header = ({
                                         </Link>
 
                                         {/* MESSAGES */}
-                                        <button className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
-                                            <MessageCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            Messages
+                                        <button
+                                            onClick={() => {
+                                                setIsMenuOpen(false);
+                                                setIsMessagesModalOpen(true);
+                                            }}
+                                            className="w-full flex items-center justify-between px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <MessageCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                                <span>Messages</span>
+                                            </div>
+                                            <span className="px-1.5 py-0.5 rounded-full bg-[#FF385C] text-white text-[10px] font-bold">
+                                                1
+                                            </span>
                                         </button>
 
                                         {/* NOTIFICATIONS */}
@@ -554,6 +567,12 @@ const Header = ({
                     onLoginSuccess={handleLoginSuccess}
                 />
             )}
+
+            {/* MESSAGES & HOST INBOX MODAL */}
+            <MessagesModal
+                isOpen={isMessagesModalOpen}
+                onClose={() => setIsMessagesModalOpen(false)}
+            />
         </>
     );
 };

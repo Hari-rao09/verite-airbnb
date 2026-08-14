@@ -587,15 +587,34 @@ export default function ListingDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
           {/* ======================= LEFT COLUMN ======================= */}
           <div className="space-y-8">
-            {/* SUBTITLE & SPECS */}
-            <div className="pb-6 border-b border-gray-200 dark:border-[#2a2a2a]">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                {listing.subtitle}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                {listing.guests} guests · {listing.bedrooms} bedrooms ·{" "}
-                {listing.beds} beds · {listing.bathrooms} bathrooms
-              </p>
+            {/* SUBTITLE & SPECS WITH HOST IDENTITY VERIFIED BADGE */}
+            <div className="flex items-center justify-between pb-6 border-b border-gray-200 dark:border-[#2a2a2a]">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                  {listing.subtitle}
+                </h2>
+                <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <span>
+                    {listing.guests} guests · {listing.bedrooms} bedrooms ·{" "}
+                    {listing.beds} beds · {listing.bathrooms} bathrooms
+                  </span>
+                  <span>•</span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Identity Verified ✓
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative shrink-0">
+                <img
+                  src={listing.host.avatar}
+                  alt={listing.host.name}
+                  className="w-14 h-14 rounded-full object-cover border border-gray-200 dark:border-[#333] shadow-sm"
+                />
+                <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full ring-2 ring-white dark:ring-[#121212]" title="Identity Verified">
+                  <ShieldCheck size={11} />
+                </div>
+              </div>
             </div>
 
             {/* GUEST FAVOURITE LAUREL CARD (IMAGE 2) */}
