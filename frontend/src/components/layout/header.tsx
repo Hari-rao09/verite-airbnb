@@ -41,6 +41,7 @@ const Header = ({
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
 
@@ -311,17 +312,33 @@ const Header = ({
                                     /* ================= LOGGED OUT ================= */
                                     <div className="py-2">
 
-                                        {/* LOGIN */}
+                                        {/* SIGN UP */}
                                         <button
-                                            onClick={handleOpenLogin}
-                                            className="w-full text-left px-5 py-4 text-sm font-semibold hover:bg-gray-50"
+                                            onClick={() => {
+                                                setAuthModalMode("register");
+                                                setIsMenuOpen(false);
+                                                setIsLoginModalOpen(true);
+                                            }}
+                                            className="w-full text-left px-5 py-3.5 text-sm font-semibold hover:bg-gray-50 transition-colors"
                                         >
-                                            Log in or sign up
+                                            Sign up
                                         </button>
 
-                                        <div className="border-t border-gray-200" />
+                                        {/* LOGIN */}
+                                        <button
+                                            onClick={() => {
+                                                setAuthModalMode("login");
+                                                setIsMenuOpen(false);
+                                                setIsLoginModalOpen(true);
+                                            }}
+                                            className="w-full text-left px-5 py-3.5 text-sm hover:bg-gray-50 transition-colors"
+                                        >
+                                            Log in
+                                        </button>
 
-                                        <button className="w-full text-left px-5 py-4 text-sm hover:bg-gray-50">
+                                        <div className="border-t border-gray-200 my-1" />
+
+                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 transition-colors">
                                             Become a host
                                         </button>
 
@@ -467,6 +484,7 @@ const Header = ({
             {/* LOGIN MODAL */}
             {isLoginModalOpen && (
                 <LoginModal
+                    initialMode={authModalMode}
                     onClose={() => setIsLoginModalOpen(false)}
                     onLoginSuccess={handleLoginSuccess}
                 />
