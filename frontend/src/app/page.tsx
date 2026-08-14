@@ -859,11 +859,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white text-[#222222]">
-
-      {/* ==================================================
-          HEADER
-      ================================================== */}
+    <main className="min-h-screen bg-white dark:bg-[#121212] text-[#222222] dark:text-gray-100 transition-colors duration-200">
 
       {/* ==================================================
           HEADER
@@ -885,13 +881,13 @@ export default function HomePage() {
       ================================================== */}
 
       {promoOpen && (
-        <div className="fixed inset-0 z-[90] bg-black/30 flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[90] bg-black/30 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
 
-          <div className="bg-white rounded-[28px] shadow-2xl max-w-[430px] w-full p-8 relative">
+          <div className="bg-white dark:bg-[#1e1e1e] rounded-[28px] shadow-2xl border border-gray-100 dark:border-[#333333] max-w-[430px] w-full p-8 relative text-gray-900 dark:text-gray-100">
 
             <button
               onClick={() => setPromoOpen(false)}
-              className="absolute right-5 top-5 w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center"
+              className="absolute right-5 top-5 w-9 h-9 rounded-full hover:bg-gray-100 dark:hover:bg-[#2c2c2c] flex items-center justify-center text-gray-600 dark:text-gray-300"
             >
               <X size={20} />
             </button>
@@ -904,18 +900,18 @@ export default function HomePage() {
 
             </div>
 
-            <h2 className="text-2xl font-bold text-center">
+            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
               One simple price
             </h2>
 
-            <p className="text-gray-600 text-center mt-3 leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-300 text-center mt-3 leading-relaxed">
               See one price for your trip,
               with all fees included.
             </p>
 
             <button
               onClick={() => setPromoOpen(false)}
-              className="mt-7 w-full bg-[#222222] text-white py-4 rounded-xl font-semibold hover:bg-black transition"
+              className="mt-7 w-full bg-[#222222] dark:bg-white text-white dark:text-black py-4 rounded-xl font-semibold hover:bg-black dark:hover:bg-gray-100 transition"
             >
               Got it
             </button>
@@ -945,8 +941,8 @@ export default function HomePage() {
                 }
                 className={`flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-full border transition ${
                   selectedFilter === filter.name
-                    ? "border-black bg-black text-white"
-                    : "border-gray-300 hover:border-black"
+                    ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+                    : "border-gray-300 dark:border-[#333333] bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 hover:border-black dark:hover:border-white"
                 }`}
               >
                 <span>
@@ -1067,7 +1063,7 @@ export default function HomePage() {
                                 "left"
                               )
                             }
-                            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:border-black hover:shadow-sm transition"
+                            className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 flex items-center justify-center hover:border-black dark:hover:border-white hover:shadow-sm transition"
                           >
                             <ChevronLeft
                               size={18}
@@ -1081,7 +1077,7 @@ export default function HomePage() {
                                 "right"
                               )
                             }
-                            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:border-black hover:shadow-sm transition"
+                            className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 flex items-center justify-center hover:border-black dark:hover:border-white hover:shadow-sm transition"
                           >
                             <ChevronRight
                               size={18}
@@ -1120,7 +1116,7 @@ export default function HomePage() {
 
                                 {/* IMAGE */}
 
-                                <div className="relative aspect-[1/1.02] rounded-2xl overflow-hidden bg-gray-100">
+                                <div className="relative aspect-[1/1.02] rounded-2xl overflow-hidden bg-gray-100 dark:bg-[#222222]">
 
                                   <img
                                     src={stay.image}
@@ -1133,19 +1129,19 @@ export default function HomePage() {
                                   {/* CATEGORY / GUEST BADGE */}
 
                                   {stay.kind === "experience" && (
-                                    <div className="absolute left-3 top-3 bg-white/95 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+                                    <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
                                       Experience
                                     </div>
                                   )}
 
                                   {stay.kind === "service" && (
-                                    <div className="absolute left-3 top-3 bg-white/95 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+                                    <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
                                       Service
                                     </div>
                                   )}
 
                                   {!stay.kind && stay.rating >= 4.9 && (
-                                    <div className="absolute left-3 top-3 bg-white/95 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+                                    <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
                                       Guest favourite
                                     </div>
                                   )}
@@ -1181,11 +1177,11 @@ export default function HomePage() {
 
                                   <div className="flex justify-between gap-3">
 
-                                    <h3 className="font-semibold truncate">
+                                    <h3 className="font-semibold truncate text-gray-900 dark:text-white">
                                       {stay.title}
                                     </h3>
 
-                                    <span className="flex items-center gap-1 text-sm shrink-0">
+                                    <span className="flex items-center gap-1 text-sm shrink-0 text-gray-900 dark:text-gray-200">
                                       <span>
                                         ★
                                       </span>
@@ -1197,22 +1193,22 @@ export default function HomePage() {
 
                                   </div>
 
-                                  <p className="text-gray-500 text-sm mt-1">
+                                  <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                                     {stay.location},{" "}
                                     {stay.country}
                                   </p>
 
-                                  <p className="text-gray-500 text-sm mt-1">
+                                  <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                                     {stay.kind === "experience" ||
                                     stay.kind === "service"
                                       ? stay.detail
                                       : `${stay.bedrooms} bedrooms · ${stay.guests} guests`}
                                   </p>
 
-                                  <p className="mt-2 font-semibold">
+                                  <p className="mt-2 font-semibold text-gray-900 dark:text-white">
                                     ₹
                                     {stay.price.toLocaleString("en-IN")}{" "}
-                                    <span className="font-normal">
+                                    <span className="font-normal text-gray-600 dark:text-gray-400">
                                       {stay.kind === "experience"
                                         ? "per person"
                                         : stay.kind === "service"
@@ -1248,17 +1244,17 @@ export default function HomePage() {
       ================================================== */}
 
       {!activeSearch && (
-        <section className="px-6 lg:px-12 py-16 border-t border-gray-200">
+        <section className="px-6 lg:px-12 py-16 border-t border-gray-200 dark:border-[#2a2a2a]">
 
           <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 
             <div>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Explore stays made for you
               </p>
 
-              <h2 className="text-3xl md:text-4xl font-bold mt-2">
+              <h2 className="text-3xl md:text-4xl font-bold mt-2 text-gray-900 dark:text-white">
                 Find your next stay
               </h2>
 
@@ -1268,7 +1264,7 @@ export default function HomePage() {
               onClick={() =>
                 setSearchOpen(true)
               }
-              className="flex items-center gap-2 font-semibold hover:underline"
+              className="flex items-center gap-2 font-semibold hover:underline text-gray-900 dark:text-white"
             >
               Explore all
               <ArrowRight size={18} />
@@ -1283,17 +1279,17 @@ export default function HomePage() {
           FOOTER
       ================================================== */}
 
-      <footer className="bg-[#f7f7f7] border-t border-gray-200 px-6 lg:px-12 py-12 mt-8">
+      <footer className="bg-[#f7f7f7] dark:bg-[#181818] border-t border-gray-200 dark:border-[#2a2a2a] px-6 lg:px-12 py-12 mt-8 text-gray-800 dark:text-gray-200">
 
         <div className="max-w-[1500px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
 
           <div>
 
-            <h3 className="font-semibold mb-5">
+            <h3 className="font-semibold mb-5 text-gray-900 dark:text-white">
               Support
             </h3>
 
-            <div className="space-y-3 text-sm text-gray-700">
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
 
               <button className="block hover:underline">
                 Help Centre
@@ -1317,11 +1313,11 @@ export default function HomePage() {
 
           <div>
 
-            <h3 className="font-semibold mb-5">
+            <h3 className="font-semibold mb-5 text-gray-900 dark:text-white">
               Hosting
             </h3>
 
-            <div className="space-y-3 text-sm text-gray-700">
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
 
               <button
                 onClick={() =>
@@ -1352,11 +1348,11 @@ export default function HomePage() {
 
           <div>
 
-            <h3 className="font-semibold mb-5">
+            <h3 className="font-semibold mb-5 text-gray-900 dark:text-white">
               Airbnb
             </h3>
 
-            <div className="space-y-3 text-sm text-gray-700">
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
 
               <button className="block hover:underline">
                 2026 Summer Release
@@ -1380,18 +1376,13 @@ export default function HomePage() {
 
         </div>
 
-        <div className="max-w-[1500px] mx-auto border-t border-gray-300 mt-10 pt-7 flex flex-col md:flex-row justify-between gap-4 text-sm">
+        <div className="max-w-[1500px] mx-auto border-t border-gray-300 dark:border-[#333333] mt-10 pt-7 flex flex-col md:flex-row justify-between gap-4 text-sm text-gray-600 dark:text-gray-400">
 
           <p>
             © 2026 AirClone · Privacy · Terms
           </p>
 
           <div className="flex items-center gap-5">
-
-            <span className="flex items-center gap-1">
-              <Globe size={16} />
-              English (IN)
-            </span>
 
             <span>₹ INR</span>
 

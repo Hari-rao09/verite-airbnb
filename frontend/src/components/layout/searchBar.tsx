@@ -82,49 +82,50 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
 
     return (
         <div className="relative flex items-center justify-center h-16 w-full pb-15 max-w-[850px] mx-auto">
-            <div className={`flex items-center w-full border border-gray-300 rounded-full shadow-lg transition-colors ${activeSection ? 'bg-[#EBEBEB]' : 'bg-white'
-                }`}>
+            <div className={`flex items-center w-full border border-gray-300 dark:border-[#383838] rounded-full shadow-lg transition-colors ${
+                activeSection ? 'bg-[#EBEBEB] dark:bg-[#2a2a2a]' : 'bg-white dark:bg-[#242424]'
+            }`}>
                 <button
                     onClick={() => setActiveSection(activeSection === 'destination' ? null : 'destination')}
                     className={`flex-1 py-3 px-8 text-left rounded-full transition-colors ${activeSection === 'destination'
-                        ? 'bg-white shadow-xl'
+                        ? 'bg-white dark:bg-[#383838] shadow-xl text-gray-900 dark:text-white'
                         : activeSection
-                            ? 'hover:bg-[#DDDDDD]'
-                            : 'hover:bg-gray-100'
+                            ? 'hover:bg-[#DDDDDD] dark:hover:bg-[#333333] text-gray-800 dark:text-gray-200'
+                            : 'hover:bg-gray-100 dark:hover:bg-[#2e2e2e] text-gray-800 dark:text-gray-200'
                         }`}
                 >
                     <div className="text-xs font-semibold">Where</div>
-                    <div className="text-sm text-gray-500">Search Destinations</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Search Destinations</div>
                 </button>
 
-                <div className={`h-8 w-px ${activeSection ? 'bg-transparent' : 'bg-gray-300'}`}></div>
+                <div className={`h-8 w-px ${activeSection ? 'bg-transparent' : 'bg-gray-300 dark:bg-gray-700'}`}></div>
 
                 <button
                     onClick={() => setActiveSection(activeSection === 'dates' ? null : 'dates')}
                     className={`flex-1 py-3 px-8 text-left rounded-full transition-colors ${activeSection === 'dates'
-                        ? 'bg-white shadow-xl'
+                        ? 'bg-white dark:bg-[#383838] shadow-xl text-gray-900 dark:text-white'
                         : activeSection
-                            ? 'hover:bg-[#DDDDDD]'
-                            : 'hover:bg-gray-100'
+                            ? 'hover:bg-[#DDDDDD] dark:hover:bg-[#333333] text-gray-800 dark:text-gray-200'
+                            : 'hover:bg-gray-100 dark:hover:bg-[#2e2e2e] text-gray-800 dark:text-gray-200'
                         }`}
                 >
                     <div className="text-xs font-semibold">When</div>
-                    <div className="text-sm text-gray-500">Add dates</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Add dates</div>
                 </button>
 
-                <div className={`h-8 w-px ${activeSection ? 'bg-transparent' : 'bg-gray-300'}`}></div>
+                <div className={`h-8 w-px ${activeSection ? 'bg-transparent' : 'bg-gray-300 dark:bg-gray-700'}`}></div>
 
                 <button
                     onClick={() => setActiveSection(activeSection === 'guests' ? null : 'guests')}
                     className={`flex-1 py-3 px-6 text-left rounded-full transition-colors ${activeSection === 'guests'
-                        ? 'bg-white shadow-xl'
+                        ? 'bg-white dark:bg-[#383838] shadow-xl text-gray-900 dark:text-white'
                         : activeSection
-                            ? 'hover:bg-[#DDDDDD]'
-                            : 'hover:bg-gray-100'
+                            ? 'hover:bg-[#DDDDDD] dark:hover:bg-[#333333] text-gray-800 dark:text-gray-200'
+                            : 'hover:bg-gray-100 dark:hover:bg-[#2e2e2e] text-gray-800 dark:text-gray-200'
                         }`}
                 >
                     <div className="text-xs font-semibold">Who</div>
-                    <div className="text-sm text-gray-500">Add Guests</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Add Guests</div>
                 </button>
 
                 <button className="mr-2 p-4 bg-rose-500 hover:bg-rose-600 text-white rounded-full cursor-pointer transition-colors">
@@ -137,12 +138,12 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                 <>
                     {activeSection === 'destination' && (
                         <div
-                            className="hidden md:flex md:flex-col absolute top-10 left-0 bg-white rounded-3xl shadow-2xl border border-gray-200 z-50"
+                            className="hidden md:flex md:flex-col absolute top-10 left-0 bg-white dark:bg-[#1e1e1e] rounded-3xl shadow-2xl border border-gray-200 dark:border-[#333333] z-50 text-gray-900 dark:text-gray-100"
                             style={{ width: '425px', maxHeight: '548px', padding: '24px 8px' }}
                         >
-                            <h3 className="text-xs font-semibold mb-3 px-6" style={{ color: '#222222' }}>Sugerencias de destinos</h3>
+                            <h3 className="text-xs font-semibold mb-3 px-6 text-gray-900 dark:text-gray-100">Suggested destinations</h3>
                             <div className="flex flex-col overflow-y-auto flex-1">
-                                <button className="flex items-center gap-4 px-6 py-3 hover:bg-gray-100 transition-colors text-left">
+                                <button className="flex items-center gap-4 px-6 py-3 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors text-left rounded-xl">
                                     <div className="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden">
                                         <img
                                             src="https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-hawaii-autosuggest-destination-icons-2/original/ea5e5ee3-e9d8-48a1-b7e9-1003bf6fe850.png"
@@ -151,15 +152,15 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                         />
                                     </div>
                                     <div>
-                                        <div className="text-sm font-medium" style={{ color: '#222222' }}>Por la zona</div>
-                                        <div className="text-sm" style={{ color: '#6A6A6A' }}>Descubre qué hay cerca de ti</div>
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">Nearby stays</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">Discover what's close to you</div>
                                     </div>
                                 </button>
 
                                 {suggestedDestinations.map((destination) => (
                                     <button
                                         key={destination.name}
-                                        className="flex items-center gap-4 px-6 py-3 hover:bg-gray-100 transition-colors text-left"
+                                        className="flex items-center gap-4 px-6 py-3 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors text-left rounded-xl"
                                     >
                                         <div className="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden">
                                             <img
@@ -169,8 +170,8 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                             />
                                         </div>
                                         <div>
-                                            <div className="text-sm font-medium" style={{ color: '#222222' }}>{destination.name}</div>
-                                            <div className="text-sm" style={{ color: '#6A6A6A' }}>{destination.description}</div>
+                                            <div className="text-sm font-medium text-gray-900 dark:text-white">{destination.name}</div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">{destination.description}</div>
                                         </div>
                                     </button>
                                 ))}
@@ -180,34 +181,34 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
 
                     {activeSection === 'dates' && (
                         <div
-                            className="hidden md:block absolute top-10 left-1/2 -translate-x-1/2 bg-white rounded-3xl shadow-2xl border border-gray-200 p-6 z-50"
+                            className="hidden md:block absolute top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1e1e1e] rounded-3xl shadow-2xl border border-gray-200 dark:border-[#333333] p-6 z-50 text-gray-900 dark:text-gray-100"
                             style={{ width: '850px', minHeight: '543.67px' }}
                         >
                             <div className="flex justify-center mb-6">
-                                <div className="inline-flex items-center bg-[#EBEBEB] rounded-full p-1 relative">
+                                <div className="inline-flex items-center bg-[#EBEBEB] dark:bg-[#2e2e2e] rounded-full p-1 relative">
                                     <button
                                         onClick={() => setDateTab('dates')}
                                         className={`px-6 py-2 rounded-full text-sm transition-all duration-300 ease-in-out relative z-10 ${dateTab === 'dates'
-                                            ? 'bg-white font-medium shadow-sm'
-                                            : 'text-gray-600 hover:bg-[#DDDDDD]'
+                                            ? 'bg-white dark:bg-[#383838] font-medium shadow-sm text-gray-900 dark:text-white'
+                                            : 'text-gray-600 dark:text-gray-300 hover:bg-[#DDDDDD] dark:hover:bg-[#383838]'
                                             }`}
                                     >
-                                        Fechas
+                                        Dates
                                     </button>
                                     <button
                                         onClick={() => setDateTab('months')}
                                         className={`px-6 py-2 rounded-full text-sm transition-all duration-300 ease-in-out relative z-10 ${dateTab === 'months'
-                                            ? 'bg-white font-medium shadow-sm'
-                                            : 'text-gray-600 hover:bg-[#DDDDDD]'
+                                            ? 'bg-white dark:bg-[#383838] font-medium shadow-sm text-gray-900 dark:text-white'
+                                            : 'text-gray-600 dark:text-gray-300 hover:bg-[#DDDDDD] dark:hover:bg-[#383838]'
                                             }`}
                                     >
-                                        Meses
+                                        Months
                                     </button>
                                     <button
                                         onClick={() => setDateTab('flexible')}
                                         className={`px-6 py-2 rounded-full text-sm transition-all duration-300 ease-in-out relative z-10 ${dateTab === 'flexible'
-                                            ? 'bg-white font-medium shadow-sm'
-                                            : 'text-gray-600 hover:bg-[#DDDDDD]'
+                                            ? 'bg-white dark:bg-[#383838] font-medium shadow-sm text-gray-900 dark:text-white'
+                                            : 'text-gray-600 dark:text-gray-300 hover:bg-[#DDDDDD] dark:hover:bg-[#383838]'
                                             }`}
                                     >
                                         Flexible
@@ -337,72 +338,72 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
 
                     {activeSection === 'guests' && (
                         <div
-                            className="hidden md:block absolute top-10 right-0 bg-white rounded-3xl shadow-2xl border border-gray-200 p-6 z-50"
+                            className="hidden md:block absolute top-10 right-0 bg-white dark:bg-[#1e1e1e] rounded-3xl shadow-2xl border border-gray-200 dark:border-[#333333] p-6 z-50 text-gray-900 dark:text-gray-100"
                             style={{ width: '425px', minHeight: '413px' }}
                         >
-                            <div className="flex items-center justify-between py-4 border-b">
+                            <div className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-[#333333]">
                                 <div>
-                                    <div className="font-semibold">Adultos</div>
-                                    <div className="text-sm text-gray-500">A partir de 13 años</div>
+                                    <div className="font-semibold text-gray-900 dark:text-white">Adults</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Ages 13 or above</div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => updateGuests('adults', false)}
                                         disabled={guests.adults === 0}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Minus className="w-4 h-4" />
                                     </button>
-                                    <span className="w-8 text-center font-medium">{guests.adults}</span>
+                                    <span className="w-8 text-center font-medium text-gray-900 dark:text-white">{guests.adults}</span>
                                     <button
                                         onClick={() => updateGuests('adults', true)}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Plus className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between py-4 border-b">
+                            <div className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-[#333333]">
                                 <div>
-                                    <div className="font-semibold">Niños</div>
-                                    <div className="text-sm text-gray-500">De 2 a 12 años</div>
+                                    <div className="font-semibold text-gray-900 dark:text-white">Children</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Ages 2–12</div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => updateGuests('children', false)}
                                         disabled={guests.children === 0}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Minus className="w-4 h-4" />
                                     </button>
-                                    <span className="w-8 text-center font-medium">{guests.children}</span>
+                                    <span className="w-8 text-center font-medium text-gray-900 dark:text-white">{guests.children}</span>
                                     <button
                                         onClick={() => updateGuests('children', true)}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Plus className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between py-4 border-b">
+                            <div className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-[#333333]">
                                 <div>
-                                    <div className="font-semibold">Bebés</div>
-                                    <div className="text-sm text-gray-500">Menos de 2 años</div>
+                                    <div className="font-semibold text-gray-900 dark:text-white">Infants</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Under 2</div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => updateGuests('babies', false)}
                                         disabled={guests.babies === 0}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Minus className="w-4 h-4" />
                                     </button>
-                                    <span className="w-8 text-center font-medium">{guests.babies}</span>
+                                    <span className="w-8 text-center font-medium text-gray-900 dark:text-white">{guests.babies}</span>
                                     <button
                                         onClick={() => updateGuests('babies', true)}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Plus className="w-4 h-4" />
                                     </button>
@@ -411,23 +412,23 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
 
                             <div className="flex items-center justify-between py-4">
                                 <div>
-                                    <div className="font-semibold">Mascotas</div>
-                                    <div className="text-sm text-gray-500 underline cursor-pointer">
-                                        ¿Traes un animal de asistencia?
+                                    <div className="font-semibold text-gray-900 dark:text-white">Pets</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400 underline cursor-pointer">
+                                        Bringing a service animal?
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => updateGuests('pets', false)}
                                         disabled={guests.pets === 0}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Minus className="w-4 h-4" />
                                     </button>
-                                    <span className="w-8 text-center font-medium">{guests.pets}</span>
+                                    <span className="w-8 text-center font-medium text-gray-900 dark:text-white">{guests.pets}</span>
                                     <button
                                         onClick={() => updateGuests('pets', true)}
-                                        className="w-8 h-8 rounded-full border border-gray-300 hover:border-gray-900 flex items-center justify-center"
+                                        className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white flex items-center justify-center text-gray-700 dark:text-gray-200"
                                     >
                                         <Plus className="w-4 h-4" />
                                     </button>

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Airbnb Full Clone - Microservicios & IA",
-  description: "Clon de Airbnb con arquitectura de microservicios | Next.js 15 + NestJS + Prisma + Stripe | JWT Auth, Booking System, Payments, Reviews & Favorites | 33 REST API endpoints | shadcn/ui + TailwindCSS | TypeScript monorepo",
+  description: "Clon de Airbnb con arquitectura de microservicios | Next.js 16 + FastAPI + SQLite | JWT Auth, Booking System, Reviews & Favorites | shadcn/ui + TailwindCSS | TypeScript",
 };
 
 export default function RootLayout({
@@ -12,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link
           rel="preload"
@@ -29,8 +30,15 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body>
-        {children}
+      <body className="bg-white dark:bg-[#121212] text-[#222222] dark:text-[#f3f4f6] antialiased transition-colors duration-200">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

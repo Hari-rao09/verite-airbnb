@@ -180,7 +180,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-[#121212] text-[#222222] dark:text-gray-100 transition-colors duration-200">
 
       <Header />
 
@@ -195,7 +195,7 @@ export default function ProfilePage() {
 
             <aside>
 
-              <h1 className="text-3xl font-semibold mb-8">
+              <h1 className="text-3xl font-semibold mb-8 text-gray-900 dark:text-white">
                 Profile
               </h1>
 
@@ -213,8 +213,11 @@ export default function ProfilePage() {
                     py-4
                     rounded-xl
                     bg-gray-100
+                    dark:bg-[#1e1e1e]
                     text-left
                     font-medium
+                    text-gray-900
+                    dark:text-white
                   "
                 >
                   <div
@@ -223,10 +226,12 @@ export default function ProfilePage() {
                       h-9
                       rounded-full
                       bg-blue-100
+                      dark:bg-blue-900/40
                       flex
                       items-center
                       justify-center
                       text-blue-700
+                      dark:text-blue-300
                       font-semibold
                     "
                   >
@@ -247,7 +252,10 @@ export default function ProfilePage() {
                     py-4
                     rounded-xl
                     hover:bg-gray-100
+                    dark:hover:bg-[#1e1e1e]
                     transition
+                    text-gray-800
+                    dark:text-gray-200
                   "
                 >
                   <span className="text-2xl">
@@ -271,8 +279,11 @@ export default function ProfilePage() {
                     py-4
                     rounded-xl
                     hover:bg-gray-100
+                    dark:hover:bg-[#1e1e1e]
                     transition
                     text-left
+                    text-gray-800
+                    dark:text-gray-200
                   "
                 >
                   <span className="text-2xl">
@@ -301,7 +312,7 @@ export default function ProfilePage() {
 
               <div className="flex items-center gap-4 mb-8">
 
-                <h2 className="text-3xl font-semibold">
+                <h2 className="text-3xl font-semibold text-gray-900 dark:text-white">
                   About me
                 </h2>
 
@@ -316,7 +327,11 @@ export default function ProfilePage() {
                     py-2
                     rounded-lg
                     bg-gray-100
+                    dark:bg-[#1e1e1e]
                     hover:bg-gray-200
+                    dark:hover:bg-[#2c2c2c]
+                    text-gray-800
+                    dark:text-gray-200
                     transition
                     text-sm
                     font-medium
@@ -341,6 +356,9 @@ export default function ProfilePage() {
                   className="
                     border
                     border-gray-200
+                    dark:border-[#2a2a2a]
+                    bg-white
+                    dark:bg-[#1e1e1e]
                     rounded-3xl
                     p-10
                     shadow-sm
@@ -355,22 +373,24 @@ export default function ProfilePage() {
                       mx-auto
                       rounded-full
                       bg-blue-100
+                      dark:bg-blue-900/40
                       flex
                       items-center
                       justify-center
                       text-4xl
                       font-semibold
                       text-blue-700
+                      dark:text-blue-300
                     "
                   >
                     {initial}
                   </div>
 
-                  <h3 className="text-3xl font-semibold mt-6">
+                  <h3 className="text-3xl font-semibold mt-6 text-gray-900 dark:text-white">
                     {name}
                   </h3>
 
-                  <p className="text-gray-500 mt-1">
+                  <p className="text-gray-500 dark:text-gray-400 mt-1">
                     {user?.is_host ? "Host" : "Guest"}
                   </p>
 
@@ -380,11 +400,11 @@ export default function ProfilePage() {
                 {/* COMPLETE PROFILE */}
                 <div className="pt-4">
 
-                  <h3 className="text-2xl font-semibold">
+                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
                     Complete your profile
                   </h3>
 
-                  <p className="text-gray-600 mt-4 leading-6">
+                  <p className="text-gray-600 dark:text-gray-300 mt-4 leading-6">
                     Your Airbnb profile is an important part
                     of every reservation. Create yours to help
                     other hosts and guests get to know you.
@@ -416,7 +436,7 @@ export default function ProfilePage() {
               {/* DIVIDER */}
               {/* ================================================= */}
 
-              <div className="border-t border-gray-200 mt-12" />
+              <div className="border-t border-gray-200 dark:border-[#2a2a2a] mt-12" />
 
 
               {/* ================================================= */}

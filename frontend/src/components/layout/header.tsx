@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import {
-    Globe,
     Menu,
     Search,
     Heart,
@@ -11,10 +11,11 @@ import {
     UserCircle,
     Bell,
     Settings,
-    Languages,
     CircleHelp,
     LogOut,
     BriefcaseBusiness,
+    Sun,
+    Moon,
 } from "lucide-react";
 import Link from "next/link";
 import LoginModal from "@/components/auth/login-modal";
@@ -45,6 +46,16 @@ const Header = ({
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
 
+    // Theme hook for Dark Mode
+    const { theme, setTheme, resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
+
     const navItems = [
         { videoSrc: "/videos/house.webm", label: "Homes" },
         { videoSrc: "/videos/balloon.webm", label: "Experiences" },
@@ -60,83 +71,97 @@ const Header = ({
         }
     };
 
-    // Check login status
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        const user = localStorage.getItem("user");
-
-        if (token) {
-            setIsLoggedIn(true);
-        } else {
-            setIsLoggedIn(false);
-        }
-
-        if (user) {
-            try {
-                const parsedUser = JSON.parse(user);
-                setUserName(parsedUser.name || "");
-            } catch (error) {
-                console.error("Failed to read user:", error);
-            }
-        } else {
-            setUserName("");
-        }
-    }, []);
-
-    // Handle scroll
+    // Scroll listener
     useEffect(() => {
         const handleScroll = () => {
-            const scrolled = window.scrollY > 80;
-
-            setIsScrolled(scrolled);
-
-            if (!scrolled) {
+            if (window.scrollY > 50) {
+                setIsScrolled(true);
                 setIsExpanded(false);
+            } else {
+                setIsScrolled(false);
+                setIsExpanded(true);
             }
         };
 
+        handleScroll();
         window.addEventListener("scroll", handleScroll);
-
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    // Check localStorage for logged-in user
+    useEffect(() => {
+        const checkAuth = () => {
+            const token = localStorage.getItem("token");
+            const storedUser = localStorage.getItem("user");
+
+            if (token && storedUser) {
+                try {
+                    const parsed = JSON.parse(storedUser);
+                    setUserName(parsed.name || parsed.email || "");
+                    setIsLoggedIn(true);
+                } catch {
+                    setIsLoggedIn(true);
+                }
+            } else {
+                setIsLoggedIn(false);
+                setUserName("");
+            }
+        };
+
+        checkAuth();
+        window.addEventListener("storage", checkAuth);
+        return () => window.removeEventListener("storage", checkAuth);
+    }, []);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => {
+            if (isMenuOpen) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        if (isMenuOpen) {
+            document.addEventListener("click", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [isMenuOpen]);
 
     const showExpanded = !isScrolled || isExpanded;
 
     const handleBackdropClick = () => {
-        setIsExpanded(false);
-        setInitialSearchSection(null);
-        setIsMenuOpen(false);
+        if (isScrolled && isExpanded) {
+            setIsExpanded(false);
+        }
+        if (isMenuOpen) {
+            setIsMenuOpen(false);
+        }
     };
 
-    // Logout
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-
-        setIsLoggedIn(false);
-        setUserName("");
-        setIsMenuOpen(false);
-        setIsLoginModalOpen(false);
-
-        // Airbnb-style: stay on the homepage
-        window.location.href = "/";
-    };
-
-    // Open login modal
     const handleOpenLogin = () => {
+        setAuthModalMode("login");
         setIsMenuOpen(false);
         setIsLoginModalOpen(true);
     };
 
-    // Login successful
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setIsLoggedIn(false);
+        setUserName("");
+        setIsMenuOpen(false);
+        router.refresh();
+    };
+
     const handleLoginSuccess = () => {
-        const user = localStorage.getItem("user");
-
-        if (user) {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
             try {
-                const parsedUser = JSON.parse(user);
-
-                setUserName(parsedUser.name || "");
+                const parsed = JSON.parse(storedUser);
+                setUserName(parsed.name || parsed.email || "");
                 setIsLoggedIn(true);
             } catch (error) {
                 console.error("Failed to read logged-in user:", error);
@@ -155,15 +180,16 @@ const Header = ({
             {/* Backdrop */}
             {(isScrolled && isExpanded) || isMenuOpen ? (
                 <div
-                    className="fixed inset-0 bg-black/20 z-40"
+                    className="fixed inset-0 bg-black/20 dark:bg-black/40 z-40 backdrop-blur-[2px] transition-opacity"
                     onClick={handleBackdropClick}
                 />
             ) : null}
 
             {/* HEADER */}
             <header
-                className={`fixed top-0 left-0 right-0 z-50 flex justify-center bg-navbar w-full border-b border-border-primary shadow-sm transition-all duration-300 ease-in-out ${showExpanded ? "h-[200px]" : "h-20"
-                    }`}
+                className={`fixed top-0 left-0 right-0 z-50 flex justify-center bg-white/95 dark:bg-[#181818]/95 backdrop-blur-md w-full border-b border-gray-200 dark:border-[#2a2a2a] shadow-sm dark:shadow-none transition-all duration-300 ease-in-out ${
+                    showExpanded ? "h-[200px]" : "h-20"
+                }`}
             >
                 <nav className="h-20 flex items-center justify-between w-full max-w-[1824px] mx-auto px-6 md:px-10 lg:px-12">
 
@@ -178,21 +204,23 @@ const Header = ({
                         <Logo />
                     </div>
 
-                    {/* TOP NAVIGATION */}
+                    {/* TOP NAVIGATION (Videos) */}
                     <div
-                        className={`hidden lg:flex items-center gap-6 transition-all duration-300 ${showExpanded
-                            ? "opacity-100 scale-100"
-                            : "opacity-0 scale-95 pointer-events-none absolute"
-                            }`}
+                        className={`hidden lg:flex items-center gap-6 transition-all duration-300 ${
+                            showExpanded
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-95 pointer-events-none absolute"
+                        }`}
                     >
                         {navItems.map((item, index) => (
                             <button
                                 key={index}
                                 onClick={() => handleTabClick(item.label)}
-                                className={`flex items-center border-b-2 pr-4 transition-all duration-200 cursor-pointer group ${activeTab === item.label
-                                    ? "border-gray-800"
-                                    : "border-transparent hover:border-gray-400"
-                                    }`}
+                                className={`flex items-center gap-3 cursor-pointer group pb-2 border-b-2 transition-all duration-200 ${
+                                    activeTab === item.label
+                                        ? "border-black dark:border-white"
+                                        : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                                }`}
                             >
                                 <video
                                     src={item.videoSrc}
@@ -204,10 +232,11 @@ const Header = ({
                                 />
 
                                 <span
-                                    className={`text-sm font-semibold transition-colors duration-200 ${activeTab === item.label
-                                        ? "text-gray-800"
-                                        : "text-gray-600 group-hover:text-gray-800"
-                                        }`}
+                                    className={`text-sm font-semibold transition-colors duration-200 ${
+                                        activeTab === item.label
+                                            ? "text-gray-900 dark:text-white"
+                                            : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200"
+                                    }`}
                                 >
                                     {item.label}
                                 </span>
@@ -217,12 +246,13 @@ const Header = ({
 
                     {/* COMPACT SEARCH WHEN SCROLLED */}
                     <div
-                        className={`hidden lg:flex items-center gap-4 flex-1 max-w-[478px] h-12 transition-all duration-300 ${!showExpanded
-                            ? "opacity-100 scale-100"
-                            : "opacity-0 scale-95 pointer-events-none absolute"
-                            }`}
+                        className={`hidden lg:flex items-center gap-4 flex-1 max-w-[478px] h-12 transition-all duration-300 ${
+                            !showExpanded
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-95 pointer-events-none absolute"
+                        }`}
                     >
-                        <div className="flex items-center justify-center bg-white border border-gray-300 rounded-full hover:shadow-lg transition-all duration-200 w-full h-full">
+                        <div className="flex items-center justify-center bg-white dark:bg-[#242424] border border-gray-300 dark:border-[#383838] rounded-full hover:shadow-lg dark:hover:shadow-black/40 transition-all duration-200 w-full h-full">
 
                             <video
                                 src="/videos/house.webm"
@@ -238,31 +268,31 @@ const Header = ({
                                     setInitialSearchSection("destination");
                                     setIsExpanded(true);
                                 }}
-                                className="flex-1 px-3 py-2.5 text-sm font-medium hover:bg-gray-50 rounded-full transition-colors cursor-pointer"
+                                className="flex-1 px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2e2e2e] rounded-full transition-colors cursor-pointer"
                             >
                                 Anywhere
                             </button>
 
-                            <div className="h-5 w-px bg-gray-300" />
+                            <div className="h-5 w-px bg-gray-300 dark:bg-gray-700" />
 
                             <button
                                 onClick={() => {
                                     setInitialSearchSection("dates");
                                     setIsExpanded(true);
                                 }}
-                                className="flex-1 px-3 py-2.5 text-sm font-medium hover:bg-gray-50 rounded-full transition-colors cursor-pointer"
+                                className="flex-1 px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2e2e2e] rounded-full transition-colors cursor-pointer"
                             >
                                 Anytime
                             </button>
 
-                            <div className="h-5 w-px bg-gray-300" />
+                            <div className="h-5 w-px bg-gray-300 dark:bg-gray-700" />
 
                             <button
                                 onClick={() => {
                                     setInitialSearchSection("guests");
                                     setIsExpanded(true);
                                 }}
-                                className="flex-1 px-3 py-2.5 text-sm text-gray-500 hover:bg-gray-50 rounded-full transition-colors cursor-pointer"
+                                className="flex-1 px-3 py-2.5 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2e2e2e] rounded-full transition-colors cursor-pointer"
                             >
                                 Add Guests
                             </button>
@@ -277,24 +307,40 @@ const Header = ({
                     <div className="flex items-center gap-2 relative">
 
                         {/* Become a host */}
-                        <button className="hidden md:block text-sm font-medium px-4 py-2.5 rounded-full hover:bg-gray-100 transition-all duration-200 cursor-pointer">
+                        <Link
+                            href="/become-a-host"
+                            className="hidden md:block text-sm font-medium px-4 py-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-[#2c2c2c] text-gray-800 dark:text-gray-200 transition-all duration-200 cursor-pointer"
+                        >
                             Become a host
-                        </button>
+                        </Link>
 
-                        {/* Globe */}
-                        <button className="p-2.5 hover:bg-gray-100 rounded-full transition-all duration-200 cursor-pointer">
-                            <Globe className="w-5 h-5 text-gray-700" />
+                        {/* DARK MODE TOGGLE (Replaced Globe) */}
+                        <button
+                            onClick={() => setTheme(isDark ? "light" : "dark")}
+                            className="p-2.5 hover:bg-gray-100 dark:hover:bg-[#2c2c2c] rounded-full transition-all duration-200 cursor-pointer text-gray-700 dark:text-gray-200"
+                            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                            aria-label="Toggle dark mode"
+                        >
+                            {mounted ? (
+                                isDark ? (
+                                    <Sun className="w-5 h-5 text-amber-400 transition-transform duration-300 rotate-0 hover:rotate-45" />
+                                ) : (
+                                    <Moon className="w-5 h-5 text-gray-700 dark:text-gray-200 transition-transform duration-300 hover:-rotate-12" />
+                                )
+                            ) : (
+                                <div className="w-5 h-5" />
+                            )}
                         </button>
 
                         {/* MENU BUTTON */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-full hover:shadow-md transition-all duration-200 cursor-pointer"
+                            className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#242424] border border-gray-300 dark:border-[#383838] rounded-full hover:shadow-md transition-all duration-200 cursor-pointer text-gray-700 dark:text-gray-200"
                         >
-                            <Menu className="w-4 h-4 text-gray-700" />
+                            <Menu className="w-4 h-4 text-gray-700 dark:text-gray-300" />
 
-                            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                                <span className="text-gray-700 text-sm font-medium">
+                            <div className="w-8 h-8 bg-gray-200 dark:bg-[#383838] rounded-full flex items-center justify-center">
+                                <span className="text-gray-700 dark:text-gray-200 text-sm font-medium">
                                     {userInitial}
                                 </span>
                             </div>
@@ -303,7 +349,7 @@ const Header = ({
                         {/* ================= MENU ================= */}
                         {isMenuOpen && (
                             <div
-                                className="absolute right-0 top-14 w-[320px] bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden z-[60]"
+                                className="absolute right-0 top-14 w-[320px] bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-xl border border-gray-200 dark:border-[#333333] overflow-hidden z-[60] text-gray-800 dark:text-gray-200"
                                 onClick={(e) => e.stopPropagation()}
                             >
 
@@ -319,7 +365,7 @@ const Header = ({
                                                 setIsMenuOpen(false);
                                                 setIsLoginModalOpen(true);
                                             }}
-                                            className="w-full text-left px-5 py-3.5 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                                            className="w-full text-left px-5 py-3.5 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
                                         >
                                             Sign up
                                         </button>
@@ -331,29 +377,46 @@ const Header = ({
                                                 setIsMenuOpen(false);
                                                 setIsLoginModalOpen(true);
                                             }}
-                                            className="w-full text-left px-5 py-3.5 text-sm hover:bg-gray-50 transition-colors"
+                                            className="w-full text-left px-5 py-3.5 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
                                         >
                                             Log in
                                         </button>
 
-                                        <div className="border-t border-gray-200 my-1" />
+                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
 
-                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 transition-colors">
+                                        <Link
+                                            href="/become-a-host"
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className="block w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
+                                        >
                                             Become a host
-                                        </button>
+                                        </Link>
 
-                                        <button className="w-full text-left px-5 py-4 text-sm hover:bg-gray-50">
+                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
                                             Refer a host
                                         </button>
 
-                                        <button className="w-full text-left px-5 py-4 text-sm hover:bg-gray-50">
+                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
                                             Find a co-host
                                         </button>
 
-                                        <div className="border-t border-gray-200" />
+                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
 
-                                        <button className="w-full flex items-center gap-3 text-left px-5 py-4 text-sm hover:bg-gray-50">
-                                            <CircleHelp className="w-5 h-5" />
+                                        {/* DARK MODE QUICK TOGGLE IN MENU */}
+                                        <button
+                                            onClick={() => setTheme(isDark ? "light" : "dark")}
+                                            className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] flex items-center justify-between"
+                                        >
+                                            <span>Dark mode</span>
+                                            {isDark ? (
+                                                <Sun className="w-4 h-4 text-amber-400" />
+                                            ) : (
+                                                <Moon className="w-4 h-4 text-gray-500" />
+                                            )}
+                                        </button>
+
+                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] flex items-center gap-3">
+                                            <CircleHelp className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                             Help Centre
                                         </button>
 
@@ -364,115 +427,117 @@ const Header = ({
                                     /* ================= LOGGED IN ================= */
                                     <div className="py-2">
 
-                                        {/* Wishlist */}
-                                        <button
-                                            onClick={() => {
-                                                setIsMenuOpen(false);
-                                                router.push("/wishlists");
-                                            }}
-                                            className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50"
-                                        >
-                                            <Heart className="w-5 h-5" />
-                                            <span>Wishlists</span>
-                                        </button>
+                                        {/* USER INFO */}
+                                        <div className="px-5 py-3 border-b border-gray-200 dark:border-[#333333]">
+                                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                                {userName}
+                                            </p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                Logged in
+                                            </p>
+                                        </div>
 
-                                        {/* Trips */}
+                                        {/* WISHLISTS */}
+                                        <Link
+                                            href="/wishlists"
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
+                                        >
+                                            <Heart className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            Wishlists
+                                        </Link>
+
+                                        {/* TRIPS / BOOKINGS */}
                                         <Link
                                             href="/bookings"
                                             onClick={() => setIsMenuOpen(false)}
-                                            className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50"
+                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
                                         >
-                                            <BriefcaseBusiness className="w-5 h-5" />
-                                            <span>Trips</span>
+                                            <BriefcaseBusiness className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            Trips
                                         </Link>
 
-                                        {/* Messages */}
-                                        <button className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50">
-                                            <MessageCircle className="w-5 h-5" />
-                                            <span>Messages</span>
+                                        {/* MESSAGES */}
+                                        <button className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
+                                            <MessageCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            Messages
                                         </button>
 
-                                        {/* Profile */}
+                                        {/* NOTIFICATIONS */}
+                                        <button className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
+                                            <Bell className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            Notifications
+                                        </button>
+
+                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
+
+                                        {/* MANAGE LISTINGS / BECOME A HOST */}
+                                        <Link
+                                            href="/become-a-host"
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
+                                        >
+                                            Airbnb your home
+                                        </Link>
+
+                                        {/* PROFILE / ACCOUNT */}
                                         <Link
                                             href="/profile"
                                             onClick={() => setIsMenuOpen(false)}
-                                            className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50"
+                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
                                         >
-                                            <UserCircle className="w-5 h-5" />
-                                            <span>Profile</span>
+                                            <UserCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            Account
                                         </Link>
 
-                                        <div className="border-t border-gray-200 my-2" />
+                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
 
-                                        {/* Notifications */}
-                                        <button className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50">
-                                            <Bell className="w-5 h-5" />
-                                            <span>Notifications</span>
+                                        {/* DARK MODE QUICK TOGGLE IN MENU */}
+                                        <button
+                                            onClick={() => setTheme(isDark ? "light" : "dark")}
+                                            className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] flex items-center justify-between"
+                                        >
+                                            <span>Dark mode</span>
+                                            {isDark ? (
+                                                <Sun className="w-4 h-4 text-amber-400" />
+                                            ) : (
+                                                <Moon className="w-4 h-4 text-gray-500" />
+                                            )}
                                         </button>
 
-                                        {/* Account settings */}
-                                        <button className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50">
-                                            <Settings className="w-5 h-5" />
-                                            <span>Account settings</span>
+                                        {/* HELP */}
+                                        <button className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
+                                            <CircleHelp className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                            Help Centre
                                         </button>
-
-                                        {/* Language */}
-                                        <button className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50">
-                                            <Languages className="w-5 h-5" />
-                                            <span>Languages & currency</span>
-                                        </button>
-
-                                        {/* Help */}
-                                        <button className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50">
-                                            <CircleHelp className="w-5 h-5" />
-                                            <span>Help Centre</span>
-                                        </button>
-
-                                        <div className="border-t border-gray-200 my-2" />
-
-                                        {/* Become host */}
-                                        <button className="w-full text-left px-5 py-3.5 hover:bg-gray-50">
-                                            <div className="font-medium">
-                                                Become a host
-                                            </div>
-
-                                            <div className="text-xs text-gray-500 mt-1">
-                                                It's easy to start hosting and earn extra income.
-                                            </div>
-                                        </button>
-
-                                        <button className="w-full text-left px-5 py-3.5 hover:bg-gray-50">
-                                            Refer a host
-                                        </button>
-
-                                        <button className="w-full text-left px-5 py-3.5 hover:bg-gray-50">
-                                            Find a co-host
-                                        </button>
-
-                                        <div className="border-t border-gray-200 my-2" />
 
                                         {/* LOGOUT */}
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full flex items-center gap-4 text-left px-5 py-4 hover:bg-gray-50"
+                                            className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] text-red-600 dark:text-red-400"
                                         >
-                                            <LogOut className="w-5 h-5" />
-                                            <span>Log out</span>
+                                            <LogOut className="w-4 h-4" />
+                                            Log out
                                         </button>
 
                                     </div>
+
                                 )}
+
                             </div>
                         )}
+
                     </div>
+
                 </nav>
 
                 {/* SEARCH BAR */}
                 <div
-                    className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${showExpanded
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-4 pointer-events-none"
-                        }`}
+                    className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${
+                        showExpanded
+                            ? "opacity-100 translate-y-0"
+                            : "opacity-0 translate-y-4 pointer-events-none"
+                    }`}
                 >
                     <SearchBar
                         key={initialSearchSection}

@@ -131,14 +131,14 @@ export default function LoginModal({
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-[500px] rounded-3xl bg-white p-7 sm:p-8 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-[500px] rounded-3xl bg-white dark:bg-[#1e1e1e] border border-gray-100 dark:border-[#333333] p-7 sm:p-8 shadow-2xl z-10 max-h-[90vh] overflow-y-auto text-gray-900 dark:text-gray-100">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 rounded-full p-2 hover:bg-gray-100 transition-colors"
+          className="absolute right-5 top-5 rounded-full p-2 hover:bg-gray-100 dark:hover:bg-[#2c2c2c] transition-colors"
           aria-label="Close modal"
         >
-          <X className="h-5 w-5 text-gray-600" />
+          <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
         </button>
 
         {/* Logo / Icon */}
@@ -156,14 +156,14 @@ export default function LoginModal({
         </div>
 
         {/* Mode Selector Tabs */}
-        <div className="mt-5 flex border-b border-gray-200">
+        <div className="mt-5 flex border-b border-gray-200 dark:border-[#333333]">
           <button
             type="button"
             onClick={() => switchMode("login")}
             className={`flex-1 pb-3 text-center text-base font-semibold transition-colors border-b-2 ${
               mode === "login"
-                ? "border-black text-black"
-                : "border-transparent text-gray-400 hover:text-gray-700"
+                ? "border-black dark:border-white text-black dark:text-white"
+                : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             }`}
           >
             Log in
@@ -173,20 +173,20 @@ export default function LoginModal({
             onClick={() => switchMode("register")}
             className={`flex-1 pb-3 text-center text-base font-semibold transition-colors border-b-2 ${
               mode === "register"
-                ? "border-black text-black"
-                : "border-transparent text-gray-400 hover:text-gray-700"
+                ? "border-black dark:border-white text-black dark:text-white"
+                : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             }`}
           >
             Sign up
           </button>
         </div>
 
-        <h2 className="mt-5 text-xl font-semibold text-gray-900">
+        <h2 className="mt-5 text-xl font-semibold text-gray-900 dark:text-white">
           {mode === "register"
             ? "Create your account"
             : "Welcome back to Airbnb"}
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           {mode === "register"
             ? "Enter your details to register and start booking stays."
             : "Log in with your email and password."}
@@ -195,7 +195,7 @@ export default function LoginModal({
         {/* Form */}
         <form onSubmit={handleSubmit} className="mt-6 space-y-3.5">
           {error && (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-600">
+            <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3.5 text-sm text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
@@ -203,7 +203,7 @@ export default function LoginModal({
           {/* Name (Registration only) */}
           {mode === "register" && (
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                 Full Name
               </label>
               <input
@@ -212,14 +212,14 @@ export default function LoginModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required={mode === "register"}
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black transition"
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#282828] text-gray-900 dark:text-white px-4 py-3 text-sm outline-none focus:border-black dark:focus:border-white transition"
               />
             </div>
           )}
 
           {/* Email */}
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
               Email Address
             </label>
             <input
@@ -228,13 +228,13 @@ export default function LoginModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black transition"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#282828] text-gray-900 dark:text-white px-4 py-3 text-sm outline-none focus:border-black dark:focus:border-white transition"
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
               Password
             </label>
             <div className="relative">
@@ -249,12 +249,12 @@ export default function LoginModal({
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={4}
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-11 text-sm outline-none focus:border-black transition"
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#282828] text-gray-900 dark:text-white px-4 py-3 pr-11 text-sm outline-none focus:border-black dark:focus:border-white transition"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -267,7 +267,7 @@ export default function LoginModal({
 
           {/* Disclaimer for Sign Up */}
           {mode === "register" && (
-            <p className="text-[11px] text-gray-500 pt-1 leading-relaxed">
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 pt-1 leading-relaxed">
               By selecting <strong>Agree and continue</strong>, you agree to
               Airbnb's Terms of Service and Privacy Policy.
             </p>
@@ -291,9 +291,9 @@ export default function LoginModal({
 
         {/* Divider */}
         <div className="my-5 flex items-center gap-4">
-          <div className="h-px flex-1 bg-gray-200" />
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
           <span className="text-xs text-gray-400 font-medium">or</span>
-          <div className="h-px flex-1 bg-gray-200" />
+          <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
         </div>
 
         {/* Social Buttons */}
@@ -303,7 +303,7 @@ export default function LoginModal({
             onClick={() =>
               alert("Google authentication is available in production.")
             }
-            className="w-full rounded-xl border border-gray-300 py-3 text-sm font-medium hover:bg-gray-50 transition flex items-center justify-center gap-3"
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#282828] text-gray-800 dark:text-gray-200 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#333333] transition flex items-center justify-center gap-3"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -331,9 +331,9 @@ export default function LoginModal({
             onClick={() =>
               alert("Apple authentication is available in production.")
             }
-            className="w-full rounded-xl border border-gray-300 py-3 text-sm font-medium hover:bg-gray-50 transition flex items-center justify-center gap-3"
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#282828] text-gray-800 dark:text-gray-200 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#333333] transition flex items-center justify-center gap-3"
           >
-            <svg className="w-4 h-4 fill-black" viewBox="0 0 170 170">
+            <svg className="w-4 h-4 fill-current text-black dark:text-white" viewBox="0 0 170 170">
               <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.05-7.62-7.85-11.77-14.42-6.41-10.12-11.44-21.68-15.08-34.69-3.64-13.01-5.46-24.87-5.46-35.58 0-14.65 3.65-26.68 10.95-36.1 7.3-9.42 16.53-14.22 27.69-14.42 5.01 0 10.51 1.34 16.5 4.02 5.99 2.68 9.77 4.07 11.34 4.17 1.89-.1 5.86-1.54 11.91-4.32 6.05-2.78 11.39-4.04 16.03-3.78 12.18.66 22.02 5.16 29.53 13.51-10.68 6.53-15.91 15.54-15.69 27.03.22 9.04 3.73 16.71 10.53 23.01 6.8 6.3 14.88 9.94 24.24 10.92-2.18 6.54-4.8 13.1-7.86 19.68zM119.22 31.85c0-7.39 2.62-14.28 7.86-20.67 5.24-6.39 11.75-10.45 19.53-12.18.22 1.09.33 2.18.33 3.27 0 7.39-2.73 14.52-8.19 21.39-5.46 6.87-12.01 10.95-19.65 12.24-.1-.87-.16-1.74-.16-2.61z" />
             </svg>
             Continue with Apple
@@ -341,14 +341,14 @@ export default function LoginModal({
         </div>
 
         {/* Footer switch prompt */}
-        <div className="mt-6 text-center text-xs text-gray-500">
+        <div className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
           {mode === "login" ? (
             <>
               Don't have an account?{" "}
               <button
                 type="button"
                 onClick={() => switchMode("register")}
-                className="font-bold text-gray-900 underline hover:text-black"
+                className="font-bold text-gray-900 dark:text-white underline hover:text-black dark:hover:text-gray-200"
               >
                 Sign up
               </button>
@@ -359,7 +359,7 @@ export default function LoginModal({
               <button
                 type="button"
                 onClick={() => switchMode("login")}
-                className="font-bold text-gray-900 underline hover:text-black"
+                className="font-bold text-gray-900 dark:text-white underline hover:text-black dark:hover:text-gray-200"
               >
                 Log in
               </button>

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     /*========== COLORS ========== */
     --color-primary: #ff385c;
@@ -15,14 +17,6 @@
 
     --color-border-primary: #ebebeb;
     --color-border-secondary: #dddddd;
-
-
-    /*========== TYPOGRAPHY ==========
-    --font-primary: "Inter", system-ui, sans-serif;
-    --font-secondary: "Roboto", system-ui, sans-serif;*/
-
-    /*========== BREAKPOINT ==========*/
-
 }
 
 /* ========== AIRBNB CEREAL FONTS ========== */
@@ -85,7 +79,6 @@
   }
   body {
     font-family: 'Airbnb Cereal', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    color: var(--color-text);
   }
   input,
   button,
