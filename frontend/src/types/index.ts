@@ -82,6 +82,31 @@ export interface Favorite {
   listing_id: number;
 }
 
+export interface HostReservation {
+  id: string;
+  guestId: string;
+  listingId: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  totalPrice: number;
+  status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'PENDING' | string;
+  nights: number;
+  listing: {
+    id: string;
+    title: string;
+    location: string;
+    propertyType: string;
+    pricePerNight: number;
+    imageUrl?: string;
+  };
+  guest: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
 export interface AuthResponse {
   user: User
   token: string
