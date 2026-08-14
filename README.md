@@ -250,11 +250,23 @@ python -m venv .venv
 # Install dependencies
 pip install -r requirements.txt
 
+# (Optional) Seed database with sample hosts, listings, bookings, and reviews
+python -m app.seed
+
 # Start FastAPI development server
 uvicorn app.main:app --reload --port 8000
 ```
 > The backend server will run at `http://localhost:8000`.  
 > Interactive API Docs: `http://localhost:8000/docs`.
+
+#### 🔑 Demo Accounts (Pre-Seeded)
+| Role | Email | Password | Details |
+| :--- | :--- | :--- | :--- |
+| **Superhost** | `host@airclone.com` | `password123` | Host with 4 properties & active bookings |
+| **Host 2** | `host2@airclone.com` | `password123` | Host with 3 mountain & beach properties |
+| **Host 3** | `host3@airclone.com` | `password123` | Host with 3 palace & treehouse stays |
+| **Guest 1** | `guest@airclone.com` | `password123` | Guest with active confirmed bookings |
+| **Guest 2** | `guest2@airclone.com` | `password123` | Guest with past completed trip |
 
 ---
 
