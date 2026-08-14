@@ -19,9 +19,10 @@ import {
   Minus,
   ArrowRight,
   Map as MapIcon,
-  List,
   Tag,
+  SlidersHorizontal,
 } from "lucide-react";
+import FilterModal, { FilterState, initialFilterState } from "@/components/home/filter-modal";
 
 type Stay = {
   id: number;
@@ -717,6 +718,10 @@ export default function HomePage() {
   const [promoVisible, setPromoVisible] = useState(false);
   const [showMapSplit, setShowMapSplit] = useState(false);
 
+  // Home Interactive Filter Modal State
+  const [isHomeFilterModalOpen, setIsHomeFilterModalOpen] = useState(false);
+  const [homeFilters, setHomeFilters] = useState<FilterState>(initialFilterState);
+
   useEffect(() => {
     // Smooth entrance transition from bottom to center on page land
     const timer = setTimeout(() => {
@@ -953,6 +958,42 @@ export default function HomePage() {
         ? serviceRows
         : filteredRows;
 
+  // Filter rows dynamically using homeFilters
+  const finalFilteredRows = useMemo(() => {
+    return categoryFilteredRows
+      .map((row) => ({
+        ...row,
+        stays: row.stays.filter((stay) => {
+          if (stay.price < homeFilters.minPrice || stay.price > homeFilters.maxPrice) return false;
+          if (homeFilters.bedrooms > 0 && stay.bedrooms < homeFilters.bedrooms) return false;
+          if (homeFilters.propertyTypes.length > 0) {
+            const match = homeFilters.propertyTypes.some((t) =>
+              stay.type?.toLowerCase().includes(t.toLowerCase()) ||
+              stay.title?.toLowerCase().includes(t.toLowerCase())
+            );
+            if (!match) return false;
+          }
+          return true;
+        }),
+      }))
+      .filter((row) => row.stays.length > 0);
+  }, [categoryFilteredRows, homeFilters]);
+
+  // Active filter count for Home Page
+  const activeHomeFilterCount = useMemo(() => {
+    let count = 0;
+    if (homeFilters.minPrice > 1000 || homeFilters.maxPrice < 50000) count++;
+    if (homeFilters.placeType !== "ANY") count++;
+    if (homeFilters.propertyTypes.length > 0) count += homeFilters.propertyTypes.length;
+    if (homeFilters.bedrooms > 0) count++;
+    if (homeFilters.beds > 0) count++;
+    if (homeFilters.bathrooms > 0) count++;
+    if (homeFilters.amenities.length > 0) count += homeFilters.amenities.length;
+    if (homeFilters.instantBook) count++;
+    if (homeFilters.selfCheckIn) count++;
+    return count;
+  }, [homeFilters]);
+
   /* -----------------------------------------------------
      FAVORITES
   ----------------------------------------------------- */
@@ -1126,32 +1167,50 @@ export default function HomePage() {
 
         <div className="max-w-[1500px] mx-auto">
 
-          {/* FILTER PILLS */}
+          {/* FILTER PILLS + FILTERS MODAL BUTTON */}
 
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex items-center justify-between gap-4 pb-2">
+            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide flex-1">
+              {filters.map((filter) => (
+                <button
+                  key={filter.name}
+                  onClick={() =>
+                    setSelectedFilter(filter.name)
+                  }
+                  className={`flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-full border transition ${
+                    selectedFilter === filter.name
+                      ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+                      : "border-gray-300 dark:border-[#333333] bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 hover:border-black dark:hover:border-white"
+                  }`}
+                >
+                  <span>
+                    {filter.icon}
+                  </span>
 
-            {filters.map((filter) => (
-              <button
-                key={filter.name}
-                onClick={() =>
-                  setSelectedFilter(filter.name)
-                }
-                className={`flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-full border transition ${
-                  selectedFilter === filter.name
-                    ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
-                    : "border-gray-300 dark:border-[#333333] bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 hover:border-black dark:hover:border-white"
-                }`}
-              >
-                <span>
-                  {filter.icon}
+                  <span className="text-sm font-medium">
+                    {filter.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsHomeFilterModalOpen(true)}
+              className={`flex items-center gap-2 px-4 py-3 rounded-full border text-xs font-bold transition shadow-sm shrink-0 ${
+                activeHomeFilterCount > 0
+                  ? "bg-black dark:bg-white text-white dark:text-black border-black dark:border-white ring-2 ring-black/10"
+                  : "border-gray-300 dark:border-[#333333] text-gray-800 dark:text-gray-200 hover:border-black dark:hover:border-white bg-white dark:bg-[#1e1e1e]"
+              }`}
+            >
+              <SlidersHorizontal size={14} />
+              <span>Filters</span>
+              {activeHomeFilterCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center font-black">
+                  {activeHomeFilterCount}
                 </span>
-
-                <span className="text-sm font-medium">
-                  {filter.name}
-                </span>
-              </button>
-            ))}
-
+              )}
+            </button>
           </div>
 
           {/* ACTIVE SEARCH */}
@@ -1199,7 +1258,7 @@ export default function HomePage() {
           ) : (
             <div className="mt-10">
 
-              {categoryFilteredRows.length === 0 ? (
+              {finalFilteredRows.length === 0 ? (
 
                 /* NO RESULTS */
 
@@ -1215,22 +1274,24 @@ export default function HomePage() {
 
                   <p className="text-gray-500 mt-2 max-w-md">
                     We couldn't find any stays
-                    matching "{activeSearch}".
-                    Try another destination.
+                    matching your current filters.
                   </p>
 
                   <button
-                    onClick={clearSearch}
-                    className="mt-6 bg-black text-white px-6 py-3 rounded-xl font-semibold"
+                    onClick={() => {
+                      clearSearch();
+                      setHomeFilters(initialFilterState);
+                    }}
+                    className="mt-6 bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-xl font-semibold"
                   >
-                    Explore all stays
+                    Clear all filters
                   </button>
 
                 </div>
 
               ) : (
 
-                categoryFilteredRows.map(
+                finalFilteredRows.map(
                   (row, rowIndex) => {
 
                     if (
@@ -1636,6 +1697,14 @@ export default function HomePage() {
         </div>
 
       </footer>
+
+      {/* HOME PAGE FILTER MODAL */}
+      <FilterModal
+        isOpen={isHomeFilterModalOpen}
+        onClose={() => setIsHomeFilterModalOpen(false)}
+        onApply={(newFilters) => setHomeFilters(newFilters)}
+        currentFilters={homeFilters}
+      />
 
     </main>
   );
