@@ -1,546 +1,300 @@
-# AirClone — Airbnb-Inspired Full-Stack Booking Platform
+# AirClone — Full-Stack Accommodation Booking Platform
 
-> **Scaler AI Assignment — Full-Stack Engineering Submission**
+<div align="center">
 
-AirClone is a full-stack accommodation booking platform built as part of a **Scaler AI assignment**. It recreates the core Airbnb-style discovery and booking experience with a polished Next.js frontend and a FastAPI backend.
+![AirClone Banner](https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80)
 
-Live On : https://air-clone-eta.vercel.app/
+[![Live Demo](https://img.shields.io/badge/Live_Demo-air--clone--eta.vercel.app-ff385c?style=for-the-badge&logo=vercel&logoColor=white)](https://air-clone-eta.vercel.app/)
+[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python_3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
 
-The focus was not only on reproducing the UI, but on creating a realistic product flow where a reviewer can **discover a property, open its listing, authenticate, and test the booking journey**.
+**A full-stack accommodation discovery and reservation platform built with a high-performance Next.js 16 frontend and a robust FastAPI backend.**
 
----
+[🚀 Explore Live App](https://air-clone-eta.vercel.app/) • [✨ Features](#-key-features) • [🏛️ Architecture](#-system-architecture) • [🔌 API Reference](#-rest-api-documentation) • [💻 Local Setup](#-getting-started-locally)
 
-## ✨ What I Built
-
-### Airbnb-inspired marketplace homepage
-
-The landing page follows the interaction patterns and visual language of the Airbnb web experience:
-
-- Airbnb-inspired header and navigation
-- All / Homes / Experiences / Services categories
-- Large interactive search bar
-- Destination, date and guest search controls
-- Language & region modal
-- Profile and menu controls
-- Popular / Arts & culture / Mountains / Beach / Amazing views categories
-- Multiple horizontal recommendation rows
-- Responsive property cards
-- Favourite/heart interactions
-- Guest-favourite badges
-- Professional spacing, typography, borders, shadows and rounded UI
-- Airbnb-inspired footer
-
-Additional marketplace content is **mocked** so the homepage can demonstrate a realistic multi-listing platform even without a production-scale dataset.
+</div>
 
 ---
 
-## 🏠 Homes & Property Discovery
+## 🌟 Overview
 
-The homepage contains multiple mocked property sections representing different destinations and recommendations.
+**AirClone** is a modern accommodation discovery and booking web application. It combines Airbnb’s signature design language and micro-interactions with an end-to-end booking lifecycle, robust JWT authentication, user registration, property management, and dynamic dark mode support.
 
-Every property card can display:
-
-- Property image
-- Property title
-- Location
-- Rating
-- Bedrooms / guests
-- Price
-- Favourite button
-- Guest-favourite badge
-- Clickable interaction
-
-### The cards are functional
-
-A property is not just a static card.
-
-The main flow is:
-
-```text
-Homepage
-   ↓
-Property Card
-   ↓
-/listing/[id]
-   ↓
-Listing Details
-   ↓
-Booking
-   ↓
-/booking/[id]
-```
-
-This allows the evaluator to start testing the actual booking implementation directly from the landing page.
+### 🔗 Deployment Links
+* **Production Frontend:** [https://air-clone-eta.vercel.app/](https://air-clone-eta.vercel.app/)
+* **Backend API Base:** `http://localhost:8000` (or configured `NEXT_PUBLIC_API_URL`)
+* **API Documentation (Swagger):** `http://localhost:8000/docs`
 
 ---
 
-# 📅 End-to-End Booking Flow
+## ✨ Key Features
 
-The booking journey is the main functional part of the application.
+### 🌙 1. Dark / Night Mode Support
+* **Seamless Theme Toggling:** Easily switch between Light and Dark themes via the animated Sun ☀️ / Moon 🌙 toggle in the top header and inside the user menu.
+* **Persistent Preferences:** Automatically saves user theme preference in `localStorage` and synchronizes with system color scheme (`prefers-color-scheme`).
+* **Complete Dark Palette:** Carefully crafted dark surfaces (`#121212`, `#181818`, `#1e1e1e`, `#242424`) with smooth transitions across headers, inputs, cards, search dialogs, and modals.
 
-A reviewer can:
+### 🔐 2. Complete Authentication & User Registration
+* **Interactive Dual-Mode Auth Modal:** Toggle between **Sign Up** (Registration) and **Log In** with one click.
+* **Instant Account Creation:** Seamlessly registers new users (`POST /auth/register`) with full name, email, and password, then automatically establishes session tokens for instant sign-in.
+* **Secure Token Handling:** JWT Bearer authentication (`python-jose`) with bcrypt password hashing (`passlib`) stored in `localStorage` with automated Axios request/response interceptors.
+* **Dedicated Standalone Pages:** Full `/login` and `/register` fallback routes for direct URL navigation.
 
-1. Open the homepage
-2. Browse properties
-3. Select a property
-4. View listing details
-5. Continue into the booking flow
-6. Authenticate where required
-7. Complete the reservation flow
-8. Access booking information
+### 🎥 3. Animated Video Navigation Header
+* **Interactive Media Tabs:** Header features looping WebM animated video icons:
+  * 🏠 **Homes:** `/videos/house.webm`
+  * 🎈 **Experiences:** `/videos/balloon.webm`
+  * 🛎️ **Services:** `/videos/consierge.webm`
+* **Adaptive Sticky Header:** Smoothly expands into full search mode at the top and collapses into a compact floating pill on scroll.
 
-Relevant routes include:
+### 🔍 4. Interactive Search Bar
+* **Where (Destinations):** Autosuggestion list with icons, image previews, and landmark descriptions.
+* **When (Dates):** Interactive calendar with Exact Dates, Month Picker, and Flexible day ranges (± 1, 2, 3, 7, 14 days).
+* **Who (Guests):** Increment/decrement counters for Adults, Children, Infants, and Pets with capacity safeguards.
 
-```text
-/listing/[id]
-/booking/[id]
-/bookings
-```
+### 📅 5. End-to-End Reservation System
+* **Live Availability Validation:** Backend queries check for date overlaps (`check_in < booking.check_out AND check_out > booking.check_in`) to prevent double bookings.
+* **Dynamic Pricing Engine:** Calculates total nights, taxes, fees, and final price breakdown.
+* **Trips Dashboard:** Dedicated `/bookings` page ("My Trips") displaying active and confirmed reservations.
 
-The same listing/booking implementation is reused from marketplace discovery surfaces so the reviewer does not need to find a special hidden page to test booking.
+### 👤 6. User Profile & Host Listing Management
+* **Profile Customization:** Edit and update name and email (`PATCH /auth/me`).
+* **Host Onboarding:** Multi-step wizard under `/become-a-host` to create and list properties.
+* **Listing Management:** Hosts can view, edit details, and soft-delete listings directly from their profile.
+
+### ❤️ 7. Wishlists & Favorites
+* Real-time heart toggles on property cards synchronized with backend wishlist endpoints (`/wishlist/`).
+* Dedicated `/wishlists` dashboard displaying all saved properties.
 
 ---
 
-# 🔐 Authentication
+## 🏛️ System Architecture
 
-The project includes an authentication flow with:
+```mermaid
+graph TD
+    subgraph Client ["Frontend — Next.js 16 (React 19 + TypeScript + Tailwind CSS v4)"]
+        UI["UI Pages & Components (/listing, /booking, /profile, /wishlists)"]
+        THEME["Theme Provider (next-themes)"]
+        API_CLIENT["Axios API Client (client.ts)"]
+        AUTH_STORE["Local Session (JWT Token & User State)"]
 
-- Login UI
-- Authentication state management
-- JWT-based backend authentication support
-- Google OAuth support
-- User-oriented protected flows
+        THEME --> UI
+        AUTH_STORE --> API_CLIENT
+        UI --> API_CLIENT
+    end
 
-Frontend authentication code is organized under:
+    subgraph Server ["Backend — FastAPI (Python 3.11+)"]
+        ROUTER_AUTH["/auth (Register, Login, Me)"]
+        ROUTER_LISTINGS["/listings (CRUD, Filters, Search)"]
+        ROUTER_BOOKINGS["/bookings (Overlap Validation, Trips)"]
+        ROUTER_WISHLIST["/wishlist (Save/Remove Listings)"]
+        ROUTER_REVIEWS["/reviews (Ratings & Comments)"]
+        ROUTER_PHOTOS["/photos (Photo Upload & Ordering)"]
+        
+        SECURITY["JWT Bearer & Bcrypt CryptContext"]
+        ORM["SQLAlchemy ORM Models"]
+    end
 
-```text
-frontend/src/components/auth/
-frontend/src/lib/api/auth.ts
-frontend/src/lib/hooks/useAuth.ts
-frontend/src/lib/stores/auth-store.ts
+    subgraph Database ["Data Store"]
+        SQLITE[("SQLite Database (airclone.db)")]
+    end
+
+    API_CLIENT <==>|"REST API / JSON (Bearer JWT)"| Server
+    Server --> ORM
+    ORM --> SQLITE
 ```
 
 ---
 
-# ❤️ Wishlist / Favourites
+## 🛠️ Technology Stack
 
-Property cards include favourite interactions and the project contains:
+### **Frontend**
+| Technology | Description |
+| :--- | :--- |
+| **Next.js 16 (App Router)** | React framework with Turbopack and server-client composition |
+| **React 19** | Modern reactive component architecture |
+| **TypeScript 5** | End-to-end static type safety and interfaces |
+| **Tailwind CSS v4** | Modern utility-first styling with `@custom-variant dark` |
+| **next-themes** | Dark mode & theme persistence |
+| **Lucide React** | Clean, modern iconography |
+| **Axios** | HTTP client with request/response Bearer token interceptors |
 
-```text
-/wishlists
-```
-
-along with backend wishlist APIs.
-
-This keeps the marketplace experience interactive instead of making the cards purely visual.
-
----
-
-# 👤 Profile
-
-A dedicated profile experience is included:
-
-```text
-/profile
-```
-
-Authentication state is separated from UI components so account functionality can be extended independently.
-
----
-
-# 🏡 Hosting Flow
-
-The project also includes a host onboarding experience:
-
-```text
-/become-a-host
-/become-a-host/about-your-place
-```
-
-This demonstrates both sides of the marketplace:
-
-```text
-Guest → Discover → Book
-
-Host → Create / manage listing
-```
+### **Backend**
+| Technology | Description |
+| :--- | :--- |
+| **FastAPI** | High-performance asynchronous Python web framework |
+| **SQLAlchemy** | Relational ORM for Python |
+| **SQLite** | Embedded SQL database engine (`airclone.db`) |
+| **Pydantic** | Data validation and schema parsing |
+| **python-jose** | JWT token creation, signing, and decoding (`HS256`) |
+| **passlib[bcrypt]** | Industrial-grade cryptographic password hashing |
+| **Uvicorn** | Lightning-fast ASGI web server |
 
 ---
 
-# 🌎 Experiences & Services
+## 🔌 REST API Documentation
 
-The Airbnb-inspired interface also includes:
+The backend provides comprehensive REST endpoints with interactive Swagger UI available at `http://localhost:8000/docs`.
 
-- **Experiences**
-- **Services**
+### 🔑 Authentication (`/auth`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/auth/register` | Register a new user (`name`, `email`, `password`) | No |
+| `POST` | `/auth/login` | Authenticate user & return JWT token | No |
+| `GET` | `/auth/me` | Retrieve authenticated user profile | Yes |
+| `PATCH` | `/auth/me` | Update user profile details | Yes |
 
-These sections contain **mocked/demo marketplace content** because the primary assignment focus is the accommodation booking flow.
+### 🏡 Listings (`/listings`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/listings/` | List active listings with location, price, guests filters | No |
+| `GET` | `/listings/{id}` | Get single listing with ordered photo gallery | No |
+| `POST` | `/listings/` | Create a new property listing | Yes |
+| `PUT` | `/listings/{id}` | Update listing details (Owner only) | Yes |
+| `DELETE` | `/listings/{id}` | Soft-delete listing (`is_active = 0`) | Yes |
 
-However, the cards remain clickable and can route into the existing listing/booking experience.
+### 📅 Bookings (`/bookings`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/bookings/` | Validate capacity/dates & create reservation | Yes |
+| `GET` | `/bookings/me` | List current user's reservations | Yes |
 
-This keeps the interaction model consistent:
-
-```text
-Homes
-   ↓
-Clickable
-   ↓
-Existing listing / booking flow
-
-Experiences
-   ↓
-Clickable
-   ↓
-Existing listing / booking flow
-
-Services
-   ↓
-Clickable
-   ↓
-Existing listing / booking flow
-```
-
-The objective is to let an evaluator test the implemented booking functionality from different discovery surfaces without duplicating booking business logic.
-
----
-
-# 🎨 UI / UX
-
-The UI was developed with a strong focus on professional marketplace presentation:
-
-- Airbnb-inspired typography
-- Airbnb Cereal font assets
-- Consistent spacing
-- Large rounded search controls
-- Responsive card layouts
-- Horizontal carousels
-- Subtle borders and shadows
-- Hover/click interactions
-- Modal-based controls
-- Responsive design
-- Reusable UI components
-
-The goal was to make the application feel like a real product rather than a collection of assignment pages.
+### ❤️ Wishlist (`/wishlist`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/wishlist/` | Fetch current user's saved wishlist | Yes |
+| `POST` | `/wishlist/{listing_id}` | Add listing to wishlist | Yes |
+| `DELETE` | `/wishlist/{listing_id}` | Remove listing from wishlist | Yes |
 
 ---
 
-# 🧩 Frontend Architecture
-
-Built with:
-
-- **Next.js**
-- **React**
-- **TypeScript**
-- **Tailwind CSS**
-- **shadcn/ui-style components**
-- Custom reusable React components
-
-Important structure:
-
-```text
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── page.tsx
-│   │   ├── listing/
-│   │   ├── booking/
-│   │   ├── bookings/
-│   │   ├── login/
-│   │   ├── profile/
-│   │   ├── wishlists/
-│   │   └── become-a-host/
-│   │
-│   ├── components/
-│   │   ├── auth/
-│   │   ├── home/
-│   │   ├── layout/
-│   │   ├── shared/
-│   │   └── ui/
-│   │
-│   ├── data/
-│   │   └── mock-properties.ts
-│   │
-│   ├── lib/
-│   │   ├── api/
-│   │   ├── hooks/
-│   │   ├── stores/
-│   │   └── utils.ts
-│   │
-│   └── types/
-│
-├── public/
-│   ├── fonts/
-│   └── videos/
-└── package.json
-```
-
-API calls are separated under `src/lib/api/`, while reusable UI and marketplace components are kept independent from page-level logic.
-
----
-
-# ⚙️ Backend Architecture
-
-The backend is implemented with **Python and FastAPI**.
-
-```text
-backend/
-└── app/
-    ├── main.py
-    ├── routers/
-    │   ├── auth.py
-    │   ├── listings.py
-    │   └── wishlist.py
-    │
-    └── schemas/
-        ├── listing.py
-        └── user.py
-```
-
-The frontend communicates with the backend through HTTP APIs rather than putting backend business logic inside React components.
-
-```text
-Next.js Frontend
-       │
-       │ HTTP API
-       ▼
-FastAPI Backend
-       │
-       ▼
-Application / Data Layer
-```
-
----
-
-# 🛠️ Technology Stack
-
-### Frontend
-
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- shadcn/ui-style components
-- Airbnb Cereal fonts
-
-### Backend
-
-- Python
-- FastAPI
-- Pydantic
-- JWT authentication
-- OAuth support
-
-### Development
-
-- Git
-- GitHub
-- VS Code
-- REST APIs
-
----
-
-# 🧪 Functional vs Mocked
-
-A deliberate distinction was made between **core functionality** and **marketplace presentation**.
-
-### Functional
-
-- Homepage navigation
-- Property discovery
-- Property cards
-- Listing detail pages
-- Booking flow
-- Booking routes
-- Authentication flow
-- Wishlist/favourites
-- Profile
-- Host onboarding routes
-- Frontend ↔ backend API communication
-
-### Mocked / Demo Content
-
-- Additional properties
-- Destination recommendation rows
-- Experiences
-- Services
-- Some secondary marketplace recommendations
-
-The mocked content exists to create a realistic marketplace experience while keeping development focused on the core booking functionality.
-
----
-
-# 🔄 Reviewer Test Journey
-
-The easiest way to evaluate the project is:
-
-```text
-Open AirClone
-     ↓
-Browse homepage
-     ↓
-Choose a property
-     ↓
-Open listing
-     ↓
-Continue to booking
-     ↓
-Authenticate if required
-     ↓
-Complete booking
-     ↓
-View booking information
-```
-
-The same booking implementation can be reached from multiple discovery surfaces.
-
----
-
-# 📁 Repository Structure
+## 📁 Repository Structure
 
 ```text
 AirClone/
-│
 ├── backend/
 │   ├── app/
-│   ├── requirements.txt
-│   └── ...
+│   │   ├── models/            # SQLAlchemy database entities (User, Listing, Booking, etc.)
+│   │   ├── routers/           # FastAPI routes (auth, listings, bookings, wishlist, reviews, photos)
+│   │   ├── schemas/           # Pydantic validation schemas
+│   │   ├── database.py        # Database session and engine setup
+│   │   ├── main.py            # FastAPI entrypoint and CORS middleware
+│   │   └── security.py        # JWT and password hashing handlers
+│   ├── airclone.db            # SQLite database file
+│   └── requirements.txt       # Python dependencies
 │
 ├── frontend/
-│   ├── src/
 │   ├── public/
-│   ├── package.json
-│   └── ...
+│   │   ├── fonts/             # Airbnb Cereal typography
+│   │   └── videos/            # Looping WebM navigation videos (house, balloon, consierge)
+│   ├── src/
+│   │   ├── app/               # Next.js App Router pages
+│   │   │   ├── become-a-host/ # Listing creation flow
+│   │   │   ├── booking/       # Checkout reservation page
+│   │   │   ├── bookings/      # User trips dashboard
+│   │   │   ├── listing/       # Property detail views
+│   │   │   ├── login/         # Standalone login route
+│   │   │   ├── register/      # Standalone registration route
+│   │   │   ├── profile/       # User profile and host listing manager
+│   │   │   ├── wishlists/     # Saved properties board
+│   │   │   ├── globals.css    # Tailwind CSS v4 custom variants & dark styling
+│   │   │   ├── layout.tsx     # Root layout with ThemeProvider
+│   │   │   └── page.tsx       # Discovery marketplace homepage
+│   │   ├── components/        # Reusable React components
+│   │   │   ├── auth/          # LoginModal (Login & Registration)
+│   │   │   ├── layout/        # Header, SearchBar, Footer
+│   │   │   └── shared/        # Logo, badges, icons
+│   │   ├── lib/
+│   │   │   └── api/           # Typed Axios services (authApi, propertiesApi, bookingsApi)
+│   │   └── types/             # TypeScript data contracts
+│   └── package.json
 │
-└── .gitignore
-```
-
-Frontend and backend are intentionally separated so they can be deployed independently.
-
----
-
-# ☁️ Deployment Architecture
-
-The intended production deployment is:
-
-```text
-                 GitHub
-                   │
-          ┌────────┴────────┐
-          ▼                 ▼
-       Vercel             Render
-          │                 │
-       Next.js            FastAPI
-       Frontend           Backend API
-          │                 │
-          └─────── API ─────┘
-```
-
-The frontend can consume the deployed backend through an environment variable such as:
-
-```text
-NEXT_PUBLIC_API_URL=<deployed-backend-url>
+└── README.md
 ```
 
 ---
 
-# 🚀 Running Locally
+## 💻 Getting Started Locally
 
-## Frontend
+### Prerequisites
+* **Node.js**: v18.17+ or v20+
+* **Python**: v3.10+
+* **npm** or **yarn** / **pnpm**
 
+---
+
+### 1. Clone the Repository
 ```bash
+git clone https://github.com/vaibhavwaliaa/AirClone.git
+cd AirClone
+```
+
+---
+
+### 2. Backend Setup
+```bash
+# Navigate to backend directory
+cd backend
+
+# Create and activate Python virtual environment
+python -m venv .venv
+
+# On Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+# On macOS/Linux:
+# source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start FastAPI development server
+uvicorn app.main:app --reload --port 8000
+```
+> The backend server will run at `http://localhost:8000`.  
+> Interactive API Docs: `http://localhost:8000/docs`.
+
+---
+
+### 3. Frontend Setup
+Open a new terminal window:
+```bash
+# Navigate to frontend directory
 cd frontend
+
+# Install Node modules
 npm install
+
+# Start Next.js Turbopack dev server
 npm run dev
 ```
-
-Open:
-
-```text
-http://localhost:3000
-```
-
-## Backend
-
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-Backend:
-
-```text
-http://127.0.0.1:8000
-```
+> Open [http://localhost:3000](http://localhost:3000) in your browser to view the app!
 
 ---
 
-# 📌 Current Status
+## 🧪 Testing the User Flow
 
-| Area | Status |
-|---|---|
-| Airbnb-inspired homepage | ✅ |
-| Responsive marketplace UI | ✅ |
-| Property discovery | ✅ |
-| Property cards | ✅ |
-| Listing details | ✅ |
-| Booking flow | ✅ |
-| Authentication | ✅ |
-| Wishlist/favourites | ✅ |
-| Profile | ✅ |
-| Host onboarding | ✅ |
-| Experiences UI | ✅ Mocked |
-| Services UI | ✅ Mocked |
-| Additional marketplace content | ✅ Mocked |
-| FastAPI backend | ✅ |
-| Frontend/backend separation | ✅ |
-| Production deployment | 🚧 |
+1. **Explore the Homepage:** Browse categories (Homes, Experiences, Services), use filter pills, test the horizontal carousels, and toggle between Light and Dark mode using the top-right button.
+2. **Sign Up / Register:** Click the user icon in the top right, select **Sign up**, enter a name, email, and password, and submit. You will be automatically logged in with a JWT session.
+3. **Save to Wishlist:** Click any heart icon on a property card to add it to your wishlist and view it under `/wishlists`.
+4. **Book a Stay:** Click on any property card, choose your dates and number of guests, and proceed through `/booking/[id]` to reserve your stay.
+5. **View Reservations:** Go to your profile menu and click **Trips** (`/bookings`) to view confirmed reservations.
 
 ---
 
-# 🎯 Assignment Objective
+## 👨‍💻 Author
 
-This project was built for the **Scaler AI assignment** with emphasis on:
-
-- Full-stack engineering
-- UI implementation
-- REST API integration
-- Authentication
-- Booking workflow
-- Reusable components
-- Responsive design
-- Marketplace interactions
-- Mock data modelling
-- Frontend/backend separation
-- Deployable architecture
-
-The implementation intentionally focuses on a **working core product journey** while using mocked marketplace content where a production platform would require a large content dataset.
+**Vaibhav Walia**  
+* GitHub: [@vaibhavwaliaa](https://github.com/vaibhavwaliaa)  
+* Project Repo: [https://github.com/vaibhavwaliaa/AirClone](https://github.com/vaibhavwaliaa/AirClone)  
+* Live Demo: [https://air-clone-eta.vercel.app/](https://air-clone-eta.vercel.app/)
 
 ---
 
-# 💡 Engineering Approach
-
-The project was designed around a simple principle:
-
-> **The UI should look realistic, but the important user journey should actually work.**
-
-Instead of building a static visual clone, the application connects discovery to the implemented listing and booking flow.
-
-This provides a practical evaluation path:
-
-**Discover → Open Listing → Authenticate → Book → Manage Booking**
-
-At the same time, reusable components, API abstractions, centralized state and separated frontend/backend architecture make the project easier to extend.
-
----
-
-## 👨‍💻 Submission
-
-**Project:** AirClone  
-**Assignment:** Scaler AI  
-**Repository:** GitHub  
-**Frontend:** Next.js / React / TypeScript  
-**Backend:** Python / FastAPI  
-**Deployment:** Vercel + Render
-
-Built as a full-stack engineering submission with emphasis on **product quality, functional workflows, clean architecture, and a professional user experience**.
+<div align="center">
+  <sub>Built with ❤️ using Next.js, React, TypeScript, Tailwind CSS, FastAPI, and SQLite.</sub>
+</div>
