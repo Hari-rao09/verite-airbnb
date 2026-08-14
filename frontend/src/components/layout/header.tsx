@@ -22,11 +22,20 @@ import LoginModal from "@/components/auth/login-modal";
 import Logo from "../shared/logo";
 import SearchBar from "./searchBar";
 
-const Header = () => {
+interface HeaderProps {
+    activeTab?: string;
+    onTabChange?: (tab: string) => void;
+}
+
+const Header = ({
+    activeTab: externalActiveTab,
+    onTabChange,
+}: HeaderProps = {}) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState("Alojamientos");
+    const [internalActiveTab, setInternalActiveTab] = useState("Homes");
+    const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
     const [initialSearchSection, setInitialSearchSection] =
         useState<"destination" | "dates" | "guests" | null>(null);
 
@@ -36,10 +45,19 @@ const Header = () => {
     const [userName, setUserName] = useState("");
 
     const navItems = [
-        { videoSrc: "/videos/house.webm", label: "Alojamientos" },
-        { videoSrc: "/videos/balloon.webm", label: "Experiencias" },
-        { videoSrc: "/videos/consierge.webm", label: "Servicios" },
+        { videoSrc: "/videos/house.webm", label: "Homes" },
+        { videoSrc: "/videos/balloon.webm", label: "Experiences" },
+        { videoSrc: "/videos/consierge.webm", label: "Services" },
     ];
+
+    const handleTabClick = (label: string) => {
+        if (onTabChange) {
+            onTabChange(label);
+        } else {
+            setInternalActiveTab(label);
+            router.push(`/?tab=${label}`);
+        }
+    };
 
     // Check login status
     useEffect(() => {
@@ -143,34 +161,37 @@ const Header = () => {
 
             {/* HEADER */}
             <header
-                className={`fixed top-0 left-0 right-0 z-50 flex justify-center bg-navbar w-full border-b border-border-primary shadow-sm transition-all duration-300 ease-in-out ${
-                    showExpanded ? "h-[200px]" : "h-20"
-                }`}
+                className={`fixed top-0 left-0 right-0 z-50 flex justify-center bg-navbar w-full border-b border-border-primary shadow-sm transition-all duration-300 ease-in-out ${showExpanded ? "h-[200px]" : "h-20"
+                    }`}
             >
                 <nav className="h-20 flex items-center justify-between w-full max-w-[1824px] mx-auto px-6 md:px-10 lg:px-12">
 
                     {/* LOGO */}
-                    <div className="cursor-pointer transition-transform duration-200 hover:scale-105">
+                    <div 
+                        onClick={() => {
+                            if (onTabChange) onTabChange("Homes");
+                            router.push("/");
+                        }}
+                        className="cursor-pointer transition-transform duration-200 hover:scale-105"
+                    >
                         <Logo />
                     </div>
 
                     {/* TOP NAVIGATION */}
                     <div
-                        className={`hidden lg:flex items-center gap-6 transition-all duration-300 ${
-                            showExpanded
-                                ? "opacity-100 scale-100"
-                                : "opacity-0 scale-95 pointer-events-none absolute"
-                        }`}
+                        className={`hidden lg:flex items-center gap-6 transition-all duration-300 ${showExpanded
+                            ? "opacity-100 scale-100"
+                            : "opacity-0 scale-95 pointer-events-none absolute"
+                            }`}
                     >
                         {navItems.map((item, index) => (
                             <button
                                 key={index}
-                                onClick={() => setActiveTab(item.label)}
-                                className={`flex items-center border-b-2 pr-4 transition-all duration-200 cursor-pointer group ${
-                                    activeTab === item.label
-                                        ? "border-gray-800"
-                                        : "border-transparent hover:border-gray-400"
-                                }`}
+                                onClick={() => handleTabClick(item.label)}
+                                className={`flex items-center border-b-2 pr-4 transition-all duration-200 cursor-pointer group ${activeTab === item.label
+                                    ? "border-gray-800"
+                                    : "border-transparent hover:border-gray-400"
+                                    }`}
                             >
                                 <video
                                     src={item.videoSrc}
@@ -182,11 +203,10 @@ const Header = () => {
                                 />
 
                                 <span
-                                    className={`text-sm font-semibold transition-colors duration-200 ${
-                                        activeTab === item.label
-                                            ? "text-gray-800"
-                                            : "text-gray-600 group-hover:text-gray-800"
-                                    }`}
+                                    className={`text-sm font-semibold transition-colors duration-200 ${activeTab === item.label
+                                        ? "text-gray-800"
+                                        : "text-gray-600 group-hover:text-gray-800"
+                                        }`}
                                 >
                                     {item.label}
                                 </span>
@@ -196,11 +216,10 @@ const Header = () => {
 
                     {/* COMPACT SEARCH WHEN SCROLLED */}
                     <div
-                        className={`hidden lg:flex items-center gap-4 flex-1 max-w-[478px] h-12 transition-all duration-300 ${
-                            !showExpanded
-                                ? "opacity-100 scale-100"
-                                : "opacity-0 scale-95 pointer-events-none absolute"
-                        }`}
+                        className={`hidden lg:flex items-center gap-4 flex-1 max-w-[478px] h-12 transition-all duration-300 ${!showExpanded
+                            ? "opacity-100 scale-100"
+                            : "opacity-0 scale-95 pointer-events-none absolute"
+                            }`}
                     >
                         <div className="flex items-center justify-center bg-white border border-gray-300 rounded-full hover:shadow-lg transition-all duration-200 w-full h-full">
 
@@ -220,7 +239,7 @@ const Header = () => {
                                 }}
                                 className="flex-1 px-3 py-2.5 text-sm font-medium hover:bg-gray-50 rounded-full transition-colors cursor-pointer"
                             >
-                                Cualquier lugar
+                                Anywhere
                             </button>
 
                             <div className="h-5 w-px bg-gray-300" />
@@ -232,7 +251,7 @@ const Header = () => {
                                 }}
                                 className="flex-1 px-3 py-2.5 text-sm font-medium hover:bg-gray-50 rounded-full transition-colors cursor-pointer"
                             >
-                                Cualquier fecha
+                                Anytime
                             </button>
 
                             <div className="h-5 w-px bg-gray-300" />
@@ -244,7 +263,7 @@ const Header = () => {
                                 }}
                                 className="flex-1 px-3 py-2.5 text-sm text-gray-500 hover:bg-gray-50 rounded-full transition-colors cursor-pointer"
                             >
-                                Añade viajeros
+                                Add Guests
                             </button>
 
                             <div className="bg-primary text-white p-2 rounded-full mr-1">
@@ -330,15 +349,15 @@ const Header = () => {
 
                                         {/* Wishlist */}
                                         <button
-    onClick={() => {
-        setIsMenuOpen(false);
-        router.push("/wishlists");
-    }}
-    className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50"
->
-    <Heart className="w-5 h-5" />
-    <span>Wishlists</span>
-</button>
+                                            onClick={() => {
+                                                setIsMenuOpen(false);
+                                                router.push("/wishlists");
+                                            }}
+                                            className="w-full flex items-center gap-4 text-left px-5 py-3.5 hover:bg-gray-50"
+                                        >
+                                            <Heart className="w-5 h-5" />
+                                            <span>Wishlists</span>
+                                        </button>
 
                                         {/* Trips */}
                                         <Link
@@ -433,11 +452,10 @@ const Header = () => {
 
                 {/* SEARCH BAR */}
                 <div
-                    className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${
-                        showExpanded
-                            ? "opacity-100 translate-y-0"
-                            : "opacity-0 translate-y-4 pointer-events-none"
-                    }`}
+                    className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${showExpanded
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-4 pointer-events-none"
+                        }`}
                 >
                     <SearchBar
                         key={initialSearchSection}
