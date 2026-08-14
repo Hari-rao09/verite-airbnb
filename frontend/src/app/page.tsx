@@ -723,6 +723,11 @@ export default function HomePage() {
   const [isHomeFilterModalOpen, setIsHomeFilterModalOpen] = useState(false);
   const [homeFilters, setHomeFilters] = useState<FilterState>(initialFilterState);
 
+  // Discovery Grid Pagination & Infinite Scroll State
+  const [exploreVisibleCount, setExploreVisibleCount] = useState(8);
+  const [isExploreLoadingMore, setIsExploreLoadingMore] = useState(false);
+  const [infiniteScrollEnabled, setInfiniteScrollEnabled] = useState(false);
+
   useEffect(() => {
     // Smooth entrance transition from bottom to center on page land
     const timer = setTimeout(() => {
@@ -994,6 +999,58 @@ export default function HomePage() {
     if (homeFilters.selfCheckIn) count++;
     return count;
   }, [homeFilters]);
+
+  // All unique stays for the Discovery Grid
+  const allDiscoveryStays = useMemo(() => {
+    const uniqueMap = new Map<number, Stay>();
+    mockedStays.forEach((s) => {
+      if (!uniqueMap.has(s.id)) uniqueMap.set(s.id, s);
+    });
+    const list = Array.from(uniqueMap.values());
+
+    return list.filter((stay) => {
+      if (stay.price < homeFilters.minPrice || stay.price > homeFilters.maxPrice) return false;
+      if (homeFilters.bedrooms > 0 && stay.bedrooms < homeFilters.bedrooms) return false;
+      if (homeFilters.propertyTypes.length > 0) {
+        const match = homeFilters.propertyTypes.some((t) =>
+          stay.type?.toLowerCase().includes(t.toLowerCase()) ||
+          stay.title?.toLowerCase().includes(t.toLowerCase())
+        );
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [homeFilters]);
+
+  const displayedDiscoveryStays = allDiscoveryStays.slice(0, exploreVisibleCount);
+
+  const handleLoadMoreDiscovery = () => {
+    if (exploreVisibleCount >= allDiscoveryStays.length || isExploreLoadingMore) return;
+    setIsExploreLoadingMore(true);
+    setTimeout(() => {
+      setExploreVisibleCount((prev) => Math.min(prev + 8, allDiscoveryStays.length));
+      setIsExploreLoadingMore(false);
+    }, 350);
+  };
+
+  // IntersectionObserver for Infinite Scroll
+  useEffect(() => {
+    if (!infiniteScrollEnabled || activeSearch || showMapSplit) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && exploreVisibleCount < allDiscoveryStays.length) {
+          handleLoadMoreDiscovery();
+        }
+      },
+      { threshold: 0.1, rootMargin: "200px" }
+    );
+
+    const sentinel = document.getElementById("discovery-infinite-sentinel");
+    if (sentinel) observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [infiniteScrollEnabled, exploreVisibleCount, allDiscoveryStays.length, activeSearch, showMapSplit]);
 
   /* -----------------------------------------------------
      FAVORITES
@@ -1541,38 +1598,169 @@ export default function HomePage() {
       </div>
 
       {/* ==================================================
-          EXPLORE ALL
+          EXPLORE ALL DISCOVERY GRID (INFINITE SCROLL / PAGINATION)
       ================================================== */}
 
-      {!activeSearch && !showMapSplit && (
+      {!activeSearch && !showMapSplit && selectedCategory === "Homes" && (
         <section className="px-6 lg:px-12 py-16 border-t border-gray-200 dark:border-[#2a2a2a]">
+          <div className="max-w-[1500px] mx-auto space-y-8">
+            {/* DISCOVERY HEADER */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#FF385C]">
+                  Discovery Grid
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold mt-1 text-gray-900 dark:text-white tracking-tight">
+                  Continue exploring all stays
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Discover {allDiscoveryStays.length} hand-picked properties across top Indian destinations
+                </p>
+              </div>
 
-          <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-
-            <div>
-
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Explore stays made for you
-              </p>
-
-              <h2 className="text-3xl md:text-4xl font-bold mt-2 text-gray-900 dark:text-white">
-                Find your next stay
-              </h2>
-
+              {/* INFINITE SCROLL TOGGLE */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setInfiniteScrollEnabled(!infiniteScrollEnabled)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold transition shadow-sm ${
+                    infiniteScrollEnabled
+                      ? "bg-emerald-600 text-white border-emerald-600 ring-2 ring-emerald-600/20"
+                      : "border-gray-300 dark:border-[#383838] bg-white dark:bg-[#1e1e1e] text-gray-700 dark:text-gray-300 hover:border-black dark:hover:border-white"
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${infiniteScrollEnabled ? "bg-white animate-ping" : "bg-gray-400"}`} />
+                  <span>{infiniteScrollEnabled ? "Infinite scroll: ON" : "Infinite scroll: OFF"}</span>
+                </button>
+              </div>
             </div>
 
-            <button
-              onClick={() =>
-                setSearchOpen(true)
-              }
-              className="flex items-center gap-2 font-semibold hover:underline text-gray-900 dark:text-white"
-            >
-              Explore all
-              <ArrowRight size={18} />
-            </button>
+            {/* 4-COLUMN PROPERTY GRID */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {displayedDiscoveryStays.map((stay) => {
+                const isFav = favorites.includes(stay.id);
+                return (
+                  <article
+                    key={`discovery-${stay.id}`}
+                    onClick={() => openListing(stay.id)}
+                    className="group cursor-pointer flex flex-col"
+                  >
+                    <div className="relative aspect-[1/1.02] rounded-2xl overflow-hidden bg-gray-100 dark:bg-[#222222] mb-3">
+                      <img
+                        src={stay.image}
+                        alt={stay.title}
+                        className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-300"
+                        loading="lazy"
+                      />
 
+                      {stay.rating >= 4.9 && (
+                        <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-gray-100 dark:border-[#333333]">
+                          ★ Guest favourite
+                        </div>
+                      )}
+
+                      <button
+                        onClick={(e) => toggleFavorite(e, stay.id)}
+                        className="absolute right-3 top-3 w-8 h-8 flex items-center justify-center"
+                        aria-label="Save to wishlists"
+                      >
+                        <Heart
+                          size={22}
+                          className={`${
+                            isFav
+                              ? "fill-[#FF385C] text-[#FF385C]"
+                              : "text-white"
+                          } drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]`}
+                        />
+                      </button>
+                    </div>
+
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate">
+                        {stay.title}
+                      </h3>
+                      <div className="flex items-center gap-1 text-xs font-bold shrink-0">
+                        <span>★</span>
+                        <span>{stay.rating.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {stay.location}, {stay.country}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {stay.bedrooms} bedrooms · {stay.guests} guests
+                    </p>
+
+                    <p className="mt-2 text-sm font-bold text-gray-900 dark:text-white">
+                      ₹{stay.price.toLocaleString("en-IN")}{" "}
+                      <span className="font-normal text-xs text-gray-500 dark:text-gray-400">
+                        night
+                      </span>
+                    </p>
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* SENTINEL FOR INFINITE SCROLL */}
+            <div id="discovery-infinite-sentinel" className="h-4 w-full" />
+
+            {/* SHOW MORE & PAGINATION CONTROLS */}
+            <div className="pt-6 pb-2 text-center space-y-4 border-t border-gray-100 dark:border-[#282828]">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                Showing {displayedDiscoveryStays.length} of {allDiscoveryStays.length} stays
+              </p>
+
+              <div className="w-64 h-1.5 bg-gray-200 dark:bg-[#333] rounded-full mx-auto overflow-hidden">
+                <div
+                  className="h-full bg-black dark:bg-white rounded-full transition-all duration-300"
+                  style={{
+                    width: `${Math.min(100, (displayedDiscoveryStays.length / allDiscoveryStays.length) * 100)}%`,
+                  }}
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                {displayedDiscoveryStays.length < allDiscoveryStays.length ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleLoadMoreDiscovery}
+                      disabled={isExploreLoadingMore}
+                      className="px-8 py-3.5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-bold text-xs hover:scale-[1.02] active:scale-[0.98] transition shadow-md disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {isExploreLoadingMore && (
+                        <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      )}
+                      <span>{isExploreLoadingMore ? "Loading more stays..." : "Show more stays"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setExploreVisibleCount(allDiscoveryStays.length)}
+                      className="px-5 py-3.5 rounded-2xl border border-gray-300 dark:border-[#383838] hover:border-black dark:hover:border-white font-bold text-xs text-gray-800 dark:text-gray-200 transition"
+                    >
+                      Show all ({allDiscoveryStays.length})
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      ✓ You've viewed all {allDiscoveryStays.length} available stays
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="px-4 py-2 rounded-full border border-gray-300 dark:border-[#383838] text-xs font-bold hover:border-black dark:hover:border-white text-gray-800 dark:text-gray-200 transition"
+                    >
+                      ↑ Back to top
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-
         </section>
       )}
 

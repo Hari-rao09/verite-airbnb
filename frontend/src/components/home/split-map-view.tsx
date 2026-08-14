@@ -75,6 +75,10 @@ export default function SplitMapView({
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(initialFilterState);
 
+  // Pagination & Load More State
+  const [visibleCount, setVisibleCount] = useState(4);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const toggleFavorite = (e: React.MouseEvent, id: number | string) => {
     e.stopPropagation();
     setFavorites((prev) =>
@@ -424,9 +428,9 @@ export default function SplitMapView({
               </div>
             )}
 
-            {/* SECONDARY LISTINGS GRID */}
+            {/* SECONDARY LISTINGS GRID WITH PAGINATION */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {otherStays.map((stay) => {
+              {otherStays.slice(0, visibleCount).map((stay) => {
                 const isFav = favorites.includes(stay.id);
                 return (
                   <div
@@ -495,6 +499,52 @@ export default function SplitMapView({
                 );
               })}
             </div>
+
+            {/* SHOW MORE STAYS / PAGINATION PROGRESS BAR */}
+            {otherStays.length > visibleCount && (
+              <div className="pt-6 pb-2 text-center space-y-3 border-t border-gray-100 dark:border-[#282828] mt-8">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  Showing {Math.min(visibleCount + 1, filteredStays.length)} of {filteredStays.length} stays in {locationName}
+                </p>
+
+                <div className="w-56 h-1.5 bg-gray-200 dark:bg-[#333] rounded-full mx-auto overflow-hidden">
+                  <div
+                    className="h-full bg-black dark:bg-white rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, ((visibleCount + 1) / filteredStays.length) * 100)}%`,
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoadingMore(true);
+                      setTimeout(() => {
+                        setVisibleCount((prev) => prev + 4);
+                        setLoadingMore(false);
+                      }, 350);
+                    }}
+                    disabled={loadingMore}
+                    className="px-7 py-3 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-bold text-xs hover:scale-[1.02] active:scale-[0.98] transition shadow-md disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {loadingMore && (
+                      <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    )}
+                    <span>{loadingMore ? "Loading stays..." : "Show more stays"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount(otherStays.length)}
+                    className="px-5 py-3 rounded-2xl border border-gray-300 dark:border-[#383838] hover:border-black dark:hover:border-white font-bold text-xs text-gray-800 dark:text-gray-200 transition"
+                  >
+                    Show all ({filteredStays.length})
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ======================= RIGHT COLUMN: INTERACTIVE MAP ======================= */}
