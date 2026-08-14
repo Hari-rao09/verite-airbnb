@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layout/header";
+import SplitMapView, { SplitStay } from "@/components/home/split-map-view";
 import {
   Search,
   Heart,
@@ -17,6 +18,7 @@ import {
   Plus,
   Minus,
   ArrowRight,
+  Map as MapIcon,
 } from "lucide-react";
 
 type Stay = {
@@ -710,8 +712,154 @@ export default function HomePage() {
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
 
   const [promoOpen, setPromoOpen] = useState(true);
+  const [showMapSplit, setShowMapSplit] = useState(false);
 
   const [favorites, setFavorites] = useState<number[]>([]);
+
+  const splitMapStays: SplitStay[] = useMemo(() => {
+    return [
+      {
+        id: 1,
+        title: "Flat in Noida",
+        headline: "Premium 2BHK Airbnb Noida | Party | Relax & Chill",
+        propertyType: "Flat",
+        location: "Noida",
+        country: "India",
+        guests: 5,
+        bedrooms: 2,
+        beds: 2,
+        bathrooms: 2,
+        price: 4250,
+        originalPrice: 8500,
+        rating: 4.76,
+        reviewCount: 17,
+        dates: "28–30 Aug",
+        image:
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+        images: [
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
+          "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=1200&q=80",
+          "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1200&q=80",
+        ],
+        lat: 28.5355,
+        lng: 77.391,
+        isGuestFavorite: true,
+        isPinned: true,
+      },
+      {
+        id: 2,
+        title: "Flat in Noida",
+        propertyType: "Flat",
+        location: "Noida",
+        country: "India",
+        guests: 4,
+        bedrooms: 2,
+        price: 2500,
+        rating: 4.2,
+        reviewCount: 5,
+        image:
+          "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&q=80",
+        lat: 28.567,
+        lng: 77.321,
+      },
+      {
+        id: 3,
+        title: "Loft in Noida",
+        propertyType: "Loft",
+        location: "Noida",
+        country: "India",
+        guests: 3,
+        bedrooms: 1,
+        price: 3000,
+        rating: 4.8,
+        reviewCount: 5,
+        image:
+          "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
+        lat: 28.582,
+        lng: 77.335,
+      },
+      {
+        id: 4,
+        title: "Modern Apartment in Noida",
+        propertyType: "Apartment",
+        location: "Noida",
+        country: "India",
+        guests: 4,
+        bedrooms: 2,
+        price: 5532,
+        rating: 4.9,
+        reviewCount: 14,
+        image:
+          "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
+        lat: 28.541,
+        lng: 77.402,
+      },
+      {
+        id: 5,
+        title: "Luxury Villa in Greater Noida",
+        propertyType: "Villa",
+        location: "Noida",
+        country: "India",
+        guests: 8,
+        bedrooms: 4,
+        price: 13170,
+        rating: 4.95,
+        reviewCount: 22,
+        image:
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+        lat: 28.474,
+        lng: 77.503,
+      },
+      {
+        id: 6,
+        title: "Penthouse Suite Noida",
+        propertyType: "Penthouse",
+        location: "Noida",
+        country: "India",
+        guests: 6,
+        bedrooms: 3,
+        price: 10168,
+        rating: 4.88,
+        reviewCount: 9,
+        image:
+          "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&q=80",
+        lat: 28.512,
+        lng: 77.378,
+      },
+      {
+        id: 7,
+        title: "Executive Flat Sector 62",
+        propertyType: "Flat",
+        location: "Noida",
+        country: "India",
+        guests: 4,
+        bedrooms: 2,
+        price: 7500,
+        rating: 4.82,
+        reviewCount: 11,
+        image:
+          "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80",
+        lat: 28.625,
+        lng: 77.368,
+      },
+      {
+        id: 8,
+        title: "Grand Residency Indirapuram",
+        propertyType: "Apartment",
+        location: "Noida",
+        country: "India",
+        guests: 5,
+        bedrooms: 3,
+        price: 11709,
+        rating: 4.91,
+        reviewCount: 18,
+        image:
+          "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
+        lat: 28.641,
+        lng: 77.382,
+      },
+    ];
+  }, []);
 
   /* -----------------------------------------------------
      SEARCH
@@ -985,265 +1133,307 @@ export default function HomePage() {
           )}
 
           {/* ==================================================
-              SEARCH RESULTS / ROWS
+              MAIN LISTINGS CONTENT (SPLIT MAP OR ROWS)
           ================================================== */}
 
-          <div className="mt-10">
+          {showMapSplit || activeSearch ? (
+            <div className="mt-8">
+              <SplitMapView
+                locationName={activeSearch || "Noida"}
+                stays={splitMapStays}
+                onBackToGrid={() => {
+                  setShowMapSplit(false);
+                  clearSearch();
+                }}
+              />
+            </div>
+          ) : (
+            <div className="mt-10">
 
-            {categoryFilteredRows.length === 0 ? (
+              {categoryFilteredRows.length === 0 ? (
 
-              /* NO RESULTS */
+                /* NO RESULTS */
 
-              <div className="min-h-[420px] flex flex-col items-center justify-center text-center">
+                <div className="min-h-[420px] flex flex-col items-center justify-center text-center">
 
-                <div className="text-6xl mb-6">
-                  🏠
+                  <div className="text-6xl mb-6">
+                    🏠
+                  </div>
+
+                  <h2 className="text-2xl font-bold">
+                    No stays found
+                  </h2>
+
+                  <p className="text-gray-500 mt-2 max-w-md">
+                    We couldn't find any stays
+                    matching "{activeSearch}".
+                    Try another destination.
+                  </p>
+
+                  <button
+                    onClick={clearSearch}
+                    className="mt-6 bg-black text-white px-6 py-3 rounded-xl font-semibold"
+                  >
+                    Explore all stays
+                  </button>
+
                 </div>
 
-                <h2 className="text-2xl font-bold">
-                  No stays found
-                </h2>
+              ) : (
 
-                <p className="text-gray-500 mt-2 max-w-md">
-                  We couldn't find any stays
-                  matching "{activeSearch}".
-                  Try another destination.
-                </p>
+                categoryFilteredRows.map(
+                  (row, rowIndex) => {
 
-                <button
-                  onClick={clearSearch}
-                  className="mt-6 bg-black text-white px-6 py-3 rounded-xl font-semibold"
-                >
-                  Explore all stays
-                </button>
+                    if (
+                      row.stays.length === 0
+                    ) {
+                      return null;
+                    }
 
-              </div>
+                    return (
+                      <section
+                        key={row.title}
+                        className="mb-14"
+                      >
 
-            ) : (
+                        {/* ROW HEADER */}
 
-              categoryFilteredRows.map(
-                (row, rowIndex) => {
+                        <div className="flex items-center justify-between mb-5">
 
-                  if (
-                    row.stays.length === 0
-                  ) {
-                    return null;
-                  }
+                          <div>
 
-                  return (
-                    <section
-                      key={row.title}
-                      className="mb-14"
-                    >
+                            <h2
+                              onClick={() => setShowMapSplit(true)}
+                              className="text-2xl font-bold hover:underline cursor-pointer flex items-center gap-2 group"
+                            >
+                              {row.title}
+                              <span className="text-sm font-normal text-gray-500 group-hover:text-black dark:group-hover:text-white">
+                                ›
+                              </span>
+                            </h2>
 
-                      {/* ROW HEADER */}
+                            {row.subtitle && (
+                              <p className="text-gray-500 mt-1">
+                                {row.subtitle}
+                              </p>
+                            )}
 
-                      <div className="flex items-center justify-between mb-5">
+                          </div>
 
-                        <div>
+                          <div className="flex gap-2">
 
-                          <h2 className="text-2xl font-bold">
-                            {row.title}
-                          </h2>
+                            <button
+                              onClick={() =>
+                                scrollRow(
+                                  rowIndex,
+                                  "left"
+                                )
+                              }
+                              className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 flex items-center justify-center hover:border-black dark:hover:border-white hover:shadow-sm transition"
+                            >
+                              <ChevronLeft
+                                size={18}
+                              />
+                            </button>
 
-                          {row.subtitle && (
-                            <p className="text-gray-500 mt-1">
-                              {row.subtitle}
-                            </p>
+                            <button
+                              onClick={() =>
+                                scrollRow(
+                                  rowIndex,
+                                  "right"
+                                )
+                              }
+                              className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 flex items-center justify-center hover:border-black dark:hover:border-white hover:shadow-sm transition"
+                            >
+                              <ChevronRight
+                                size={18}
+                              />
+                            </button>
+
+                          </div>
+
+                        </div>
+
+                        {/* LISTINGS */}
+
+                        <div
+                          id={`listing-row-${rowIndex}`}
+                          className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth"
+                        >
+
+                          {row.stays.map(
+                            (stay) => {
+
+                              const isFavorite =
+                                favorites.includes(
+                                  stay.id
+                                );
+
+                              return (
+                                <article
+                                  key={stay.id}
+                                  onClick={() =>
+                                    openListing(
+                                      stay.id
+                                    )
+                                  }
+                                  className="group w-[245px] sm:w-[270px] md:w-[285px] min-w-[245px] sm:min-w-[270px] md:min-w-[285px] flex-none cursor-pointer"
+                                >
+
+                                  {/* IMAGE */}
+
+                                  <div className="relative aspect-[1/1.02] rounded-2xl overflow-hidden bg-gray-100 dark:bg-[#222222]">
+
+                                    <img
+                                      src={stay.image}
+                                      alt={
+                                        stay.title
+                                      }
+                                      className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-300"
+                                    />
+
+                                    {/* CATEGORY / GUEST BADGE */}
+
+                                    {stay.kind === "experience" && (
+                                      <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
+                                        Experience
+                                      </div>
+                                    )}
+
+                                    {stay.kind === "service" && (
+                                      <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
+                                        Service
+                                      </div>
+                                    )}
+
+                                    {!stay.kind && stay.rating >= 4.9 && (
+                                      <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
+                                        Guest favourite
+                                      </div>
+                                    )}
+
+                                    {/* HEART */}
+
+                                    <button
+                                      onClick={(
+                                        event
+                                      ) =>
+                                        toggleFavorite(
+                                          event,
+                                          stay.id
+                                        )
+                                      }
+                                      className="absolute right-3 top-3 w-9 h-9 flex items-center justify-center"
+                                    >
+                                      <Heart
+                                        size={25}
+                                        className={`${
+                                          isFavorite
+                                            ? "fill-[#FF385C] text-[#FF385C]"
+                                            : "text-white"
+                                        } drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]`}
+                                      />
+                                    </button>
+
+                                  </div>
+
+                                  {/* DETAILS */}
+
+                                  <div className="mt-3">
+
+                                    <div className="flex justify-between gap-3">
+
+                                      <h3 className="font-semibold truncate text-gray-900 dark:text-white">
+                                        {stay.title}
+                                      </h3>
+
+                                      <span className="flex items-center gap-1 text-sm shrink-0 text-gray-900 dark:text-gray-200">
+                                        <span>
+                                          ★
+                                        </span>
+
+                                        {stay.rating.toFixed(
+                                          2
+                                        )}
+                                      </span>
+
+                                    </div>
+
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                                      {stay.location},{" "}
+                                      {stay.country}
+                                    </p>
+
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                                      {stay.kind === "experience" ||
+                                      stay.kind === "service"
+                                        ? stay.detail
+                                        : `${stay.bedrooms} bedrooms · ${stay.guests} guests`}
+                                    </p>
+
+                                    <p className="mt-2 font-semibold text-gray-900 dark:text-white">
+                                      ₹
+                                      {stay.price.toLocaleString("en-IN")}{" "}
+                                      <span className="font-normal text-gray-600 dark:text-gray-400">
+                                        {stay.kind === "experience"
+                                          ? "per person"
+                                          : stay.kind === "service"
+                                            ? "starting"
+                                            : "night"}
+                                      </span>
+                                    </p>
+
+                                  </div>
+
+                                </article>
+                              );
+                            }
                           )}
 
                         </div>
 
-                        <div className="flex gap-2">
+                      </section>
+                    );
+                  }
+                )
 
-                          <button
-                            onClick={() =>
-                              scrollRow(
-                                rowIndex,
-                                "left"
-                              )
-                            }
-                            className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 flex items-center justify-center hover:border-black dark:hover:border-white hover:shadow-sm transition"
-                          >
-                            <ChevronLeft
-                              size={18}
-                            />
-                          </button>
+              )}
 
-                          <button
-                            onClick={() =>
-                              scrollRow(
-                                rowIndex,
-                                "right"
-                              )
-                            }
-                            className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-800 dark:text-gray-200 flex items-center justify-center hover:border-black dark:hover:border-white hover:shadow-sm transition"
-                          >
-                            <ChevronRight
-                              size={18}
-                            />
-                          </button>
-
-                        </div>
-
-                      </div>
-
-                      {/* LISTINGS */}
-
-                      <div
-                        id={`listing-row-${rowIndex}`}
-                        className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth"
-                      >
-
-                        {row.stays.map(
-                          (stay) => {
-
-                            const isFavorite =
-                              favorites.includes(
-                                stay.id
-                              );
-
-                            return (
-                              <article
-                                key={stay.id}
-                                onClick={() =>
-                                  openListing(
-                                    stay.id
-                                  )
-                                }
-                                className="group w-[245px] sm:w-[270px] md:w-[285px] min-w-[245px] sm:min-w-[270px] md:min-w-[285px] flex-none cursor-pointer"
-                              >
-
-                                {/* IMAGE */}
-
-                                <div className="relative aspect-[1/1.02] rounded-2xl overflow-hidden bg-gray-100 dark:bg-[#222222]">
-
-                                  <img
-                                    src={stay.image}
-                                    alt={
-                                      stay.title
-                                    }
-                                    className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-300"
-                                  />
-
-                                  {/* CATEGORY / GUEST BADGE */}
-
-                                  {stay.kind === "experience" && (
-                                    <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
-                                      Experience
-                                    </div>
-                                  )}
-
-                                  {stay.kind === "service" && (
-                                    <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
-                                      Service
-                                    </div>
-                                  )}
-
-                                  {!stay.kind && stay.rating >= 4.9 && (
-                                    <div className="absolute left-3 top-3 bg-white/95 dark:bg-[#1e1e1e]/95 text-gray-900 dark:text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border border-gray-100 dark:border-[#333333]">
-                                      Guest favourite
-                                    </div>
-                                  )}
-
-                                  {/* HEART */}
-
-                                  <button
-                                    onClick={(
-                                      event
-                                    ) =>
-                                      toggleFavorite(
-                                        event,
-                                        stay.id
-                                      )
-                                    }
-                                    className="absolute right-3 top-3 w-9 h-9 flex items-center justify-center"
-                                  >
-                                    <Heart
-                                      size={25}
-                                      className={`${
-                                        isFavorite
-                                          ? "fill-[#FF385C] text-[#FF385C]"
-                                          : "text-white"
-                                      } drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]`}
-                                    />
-                                  </button>
-
-                                </div>
-
-                                {/* DETAILS */}
-
-                                <div className="mt-3">
-
-                                  <div className="flex justify-between gap-3">
-
-                                    <h3 className="font-semibold truncate text-gray-900 dark:text-white">
-                                      {stay.title}
-                                    </h3>
-
-                                    <span className="flex items-center gap-1 text-sm shrink-0 text-gray-900 dark:text-gray-200">
-                                      <span>
-                                        ★
-                                      </span>
-
-                                      {stay.rating.toFixed(
-                                        2
-                                      )}
-                                    </span>
-
-                                  </div>
-
-                                  <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                                    {stay.location},{" "}
-                                    {stay.country}
-                                  </p>
-
-                                  <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                                    {stay.kind === "experience" ||
-                                    stay.kind === "service"
-                                      ? stay.detail
-                                      : `${stay.bedrooms} bedrooms · ${stay.guests} guests`}
-                                  </p>
-
-                                  <p className="mt-2 font-semibold text-gray-900 dark:text-white">
-                                    ₹
-                                    {stay.price.toLocaleString("en-IN")}{" "}
-                                    <span className="font-normal text-gray-600 dark:text-gray-400">
-                                      {stay.kind === "experience"
-                                        ? "per person"
-                                        : stay.kind === "service"
-                                          ? "starting"
-                                          : "night"}
-                                    </span>
-                                  </p>
-
-                                </div>
-
-                              </article>
-                            );
-                          }
-                        )}
-
-                      </div>
-
-                    </section>
-                  );
-                }
-              )
-
-            )}
-
-          </div>
+            </div>
+          )}
 
         </div>
 
       </section>
 
       {/* ==================================================
+          FLOATING "SHOW MAP" / "SHOW LIST" BUTTON
+      ================================================== */}
+
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40">
+        <button
+          onClick={() => setShowMapSplit(!showMapSplit)}
+          className="bg-[#222222] dark:bg-white text-white dark:text-black px-6 py-3.5 rounded-full font-bold text-sm shadow-2xl hover:scale-105 active:scale-95 transition duration-200 flex items-center gap-2 border border-white/20 dark:border-black/20"
+        >
+          {showMapSplit ? (
+            <>
+              <span>Show list</span>
+              <span>📋</span>
+            </>
+          ) : (
+            <>
+              <span>Show map</span>
+              <MapIcon size={16} />
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* ==================================================
           EXPLORE ALL
       ================================================== */}
 
-      {!activeSearch && (
+      {!activeSearch && !showMapSplit && (
         <section className="px-6 lg:px-12 py-16 border-t border-gray-200 dark:border-[#2a2a2a]">
 
           <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">

@@ -101,3 +101,54 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ========== AIRBNB MAP MARKERS ========== */
+.airbnb-price-marker {
+  background: white;
+  color: #222222;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 5px 9px;
+  border-radius: 20px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.airbnb-price-marker:hover,
+.airbnb-price-marker.active {
+  background: #222222;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  z-index: 999 !important;
+}
+
+.dark .airbnb-price-marker {
+  background: #1e1e1e;
+  color: #ffffff;
+  border: 1px solid #333333;
+}
+
+.dark .airbnb-price-marker:hover,
+.dark .airbnb-price-marker.active {
+  background: #ffffff;
+  color: #000000;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2) !important;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: normal !important;
+}
+
