@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Search, Plus, Minus, X, MapPin, CalendarDays, Users } from "lucide-react";
 
@@ -12,9 +13,9 @@ interface SearchBarProps {
 
 const SearchBar = ({ initialSection }: SearchBarProps) => {
     const router = useRouter();
+    const [mounted, setMounted] = useState(false);
     const [activeSection, setActiveSection] = useState<ActiveSection>(initialSection || null);
     const [dateTab, setDateTab] = useState<'dates' | 'months' | 'flexible'>('dates');
-    const [flexibility, setFlexibility] = useState<string>('exact');
     const [searchLocation, setSearchLocation] = useState<string>("");
     const [selectedDates, setSelectedDates] = useState<{ start: number | null; end: number | null }>({
         start: 28,
@@ -28,10 +29,26 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
     });
 
     useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
         if (initialSection) {
             setActiveSection(initialSection);
         }
     }, [initialSection]);
+
+    // Prevent body scroll on mobile when modal is active
+    useEffect(() => {
+        if (activeSection && typeof window !== 'undefined' && window.innerWidth < 768) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [activeSection]);
 
     const totalGuests = guests.adults + guests.children;
 
@@ -106,7 +123,7 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                 {/* WHERE */}
                 <button
                     onClick={() => setActiveSection(activeSection === 'destination' ? null : 'destination')}
-                    className={`flex-1 py-3 px-6 md:px-8 text-left rounded-full transition-colors ${activeSection === 'destination'
+                    className={`flex-1 py-3 px-4 sm:px-6 md:px-8 text-left rounded-full transition-colors ${activeSection === 'destination'
                         ? 'bg-white dark:bg-[#383838] shadow-xl text-gray-900 dark:text-white'
                         : activeSection
                             ? 'hover:bg-[#DDDDDD] dark:hover:bg-[#333333] text-gray-800 dark:text-gray-200'
@@ -124,7 +141,7 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                 {/* WHEN */}
                 <button
                     onClick={() => setActiveSection(activeSection === 'dates' ? null : 'dates')}
-                    className={`flex-1 py-3 px-6 md:px-8 text-left rounded-full transition-colors ${activeSection === 'dates'
+                    className={`flex-1 py-3 px-4 sm:px-6 md:px-8 text-left rounded-full transition-colors ${activeSection === 'dates'
                         ? 'bg-white dark:bg-[#383838] shadow-xl text-gray-900 dark:text-white'
                         : activeSection
                             ? 'hover:bg-[#DDDDDD] dark:hover:bg-[#333333] text-gray-800 dark:text-gray-200'
@@ -142,7 +159,7 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                 {/* WHO */}
                 <button
                     onClick={() => setActiveSection(activeSection === 'guests' ? null : 'guests')}
-                    className={`flex-1 py-3 px-4 md:px-6 text-left rounded-full transition-colors ${activeSection === 'guests'
+                    className={`flex-1 py-3 px-3 sm:px-4 md:px-6 text-left rounded-full transition-colors ${activeSection === 'guests'
                         ? 'bg-white dark:bg-[#383838] shadow-xl text-gray-900 dark:text-white'
                         : activeSection
                             ? 'hover:bg-[#DDDDDD] dark:hover:bg-[#333333] text-gray-800 dark:text-gray-200'
@@ -404,36 +421,47 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                 </>
             )}
 
-            {/* =========================================================================
-                MOBILE FULL SCREEN MODAL (md:hidden)
-            ========================================================================= */}
+            {/* Desktop Backdrop for outside click */}
             {activeSection && (
-                <div className="md:hidden fixed inset-0 z-[100] bg-white dark:bg-[#121212] flex flex-col text-gray-900 dark:text-gray-100 animate-in fade-in duration-200">
+                <div
+                    className="hidden md:block fixed inset-0 z-40"
+                    onClick={() => setActiveSection(null)}
+                ></div>
+            )}
+
+            {/* =========================================================================
+                MOBILE FULL SCREEN MODAL VIA REACT PORTAL (md:hidden)
+                Rendered at document.body level to prevent ancestor backdrop-blur/transforms
+                from clipping or restricting the fixed viewport.
+            ========================================================================= */}
+            {mounted && activeSection && createPortal(
+                <div className="md:hidden fixed inset-0 z-[99999] h-[100dvh] w-screen bg-white dark:bg-[#121212] flex flex-col text-gray-900 dark:text-gray-100 animate-in slide-in-from-bottom duration-250">
                     {/* Top Bar */}
-                    <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-gray-200 dark:border-[#2a2a2a]">
+                    <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-gray-200 dark:border-[#2a2a2a] shrink-0 bg-white dark:bg-[#121212]">
                         <button
                             onClick={() => setActiveSection(null)}
-                            className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300"
+                            className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#252525] transition"
+                            aria-label="Close search"
                         >
                             <X size={18} />
                         </button>
 
-                        <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#252525] p-1 rounded-full text-xs font-bold">
+                        <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#222222] p-1 rounded-full text-xs font-bold">
                             <button
                                 onClick={() => setActiveSection('destination')}
-                                className={`px-3 py-1.5 rounded-full transition ${activeSection === 'destination' ? 'bg-white dark:bg-[#383838] shadow-sm text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                                className={`px-3.5 py-1.5 rounded-full transition ${activeSection === 'destination' ? 'bg-white dark:bg-[#383838] shadow-sm text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
                             >
                                 Where
                             </button>
                             <button
                                 onClick={() => setActiveSection('dates')}
-                                className={`px-3 py-1.5 rounded-full transition ${activeSection === 'dates' ? 'bg-white dark:bg-[#383838] shadow-sm text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                                className={`px-3.5 py-1.5 rounded-full transition ${activeSection === 'dates' ? 'bg-white dark:bg-[#383838] shadow-sm text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
                             >
                                 When
                             </button>
                             <button
                                 onClick={() => setActiveSection('guests')}
-                                className={`px-3 py-1.5 rounded-full transition ${activeSection === 'guests' ? 'bg-white dark:bg-[#383838] shadow-sm text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                                className={`px-3.5 py-1.5 rounded-full transition ${activeSection === 'guests' ? 'bg-white dark:bg-[#383838] shadow-sm text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
                             >
                                 Who
                             </button>
@@ -443,7 +471,7 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                     </div>
 
                     {/* Scrollable Content Body */}
-                    <div className="flex-1 overflow-y-auto px-5 py-6">
+                    <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
                         {/* WHERE / DESTINATION */}
                         {activeSection === 'destination' && (
                             <div className="space-y-6">
@@ -455,7 +483,7 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                         value={searchLocation}
                                         onChange={(e) => setSearchLocation(e.target.value)}
                                         placeholder="Search destinations (e.g. Noida, Goa)"
-                                        className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 dark:border-[#383838] bg-gray-50 dark:bg-[#1e1e1e] font-semibold text-base focus:border-black dark:focus:border-white transition"
+                                        className="w-full pl-12 pr-10 py-4 rounded-2xl border border-gray-300 dark:border-[#383838] bg-gray-50 dark:bg-[#1e1e1e] font-semibold text-base focus:border-black dark:focus:border-white transition outline-none"
                                     />
                                     {searchLocation && (
                                         <button
@@ -477,7 +505,7 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                                     setSearchLocation(dest.name);
                                                     setActiveSection('dates');
                                                 }}
-                                                className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-[#252525] transition text-left"
+                                                className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-[#222222] transition text-left"
                                             >
                                                 <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-gray-200 dark:bg-[#333]">
                                                     <img src={dest.image} alt={dest.name} className="w-full h-full object-cover" />
@@ -545,14 +573,14 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                             <button
                                                 onClick={() => updateGuests('adults', false)}
                                                 disabled={guests.adults === 0}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Minus className="w-4 h-4" />
                                             </button>
                                             <span className="w-8 text-center font-bold text-base">{guests.adults}</span>
                                             <button
                                                 onClick={() => updateGuests('adults', true)}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </button>
@@ -569,14 +597,14 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                             <button
                                                 onClick={() => updateGuests('children', false)}
                                                 disabled={guests.children === 0}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Minus className="w-4 h-4" />
                                             </button>
                                             <span className="w-8 text-center font-bold text-base">{guests.children}</span>
                                             <button
                                                 onClick={() => updateGuests('children', true)}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </button>
@@ -593,14 +621,14 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                             <button
                                                 onClick={() => updateGuests('babies', false)}
                                                 disabled={guests.babies === 0}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Minus className="w-4 h-4" />
                                             </button>
                                             <span className="w-8 text-center font-bold text-base">{guests.babies}</span>
                                             <button
                                                 onClick={() => updateGuests('babies', true)}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </button>
@@ -617,14 +645,14 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                                             <button
                                                 onClick={() => updateGuests('pets', false)}
                                                 disabled={guests.pets === 0}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center disabled:opacity-30 hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Minus className="w-4 h-4" />
                                             </button>
                                             <span className="w-8 text-center font-bold text-base">{guests.pets}</span>
                                             <button
                                                 onClick={() => updateGuests('pets', true)}
-                                                className="w-9 h-9 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
+                                                className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-black dark:hover:border-white transition"
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </button>
@@ -636,7 +664,7 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                     </div>
 
                     {/* Mobile Bottom Action Footer */}
-                    <div className="border-t border-gray-200 dark:border-[#2a2a2a] p-4 bg-white dark:bg-[#181818] flex items-center justify-between gap-4">
+                    <div className="border-t border-gray-200 dark:border-[#2a2a2a] px-6 py-4 bg-white dark:bg-[#181818] pb-[max(1.25rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-4 shrink-0 shadow-lg">
                         <button
                             onClick={clearAll}
                             className="font-bold text-sm underline text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white px-2 py-2"
@@ -652,15 +680,8 @@ const SearchBar = ({ initialSection }: SearchBarProps) => {
                             Search
                         </button>
                     </div>
-                </div>
-            )}
-
-            {/* Desktop Backdrop for outside click */}
-            {activeSection && (
-                <div
-                    className="hidden md:block fixed inset-0 z-40"
-                    onClick={() => setActiveSection(null)}
-                ></div>
+                </div>,
+                document.body
             )}
         </div>
     );
