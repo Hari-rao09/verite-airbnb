@@ -222,8 +222,17 @@ export default function ListingDetailPage() {
   const serviceFee = Math.round(basePrice * 0.12);
   const totalPrice = basePrice + cleaningFee + serviceFee;
 
+  // Today's date string in YYYY-MM-DD
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }, []);
+
   const handleDateClick = (dateStr: string) => {
-    if (isDateBooked(dateStr)) return;
+    if (dateStr < todayStr || isDateBooked(dateStr)) return;
 
     if (!checkInDate || (checkInDate && checkOutDate)) {
       setCheckInDate(dateStr);
@@ -299,6 +308,7 @@ export default function ListingDetailPage() {
           {Array.from({ length: totalDays }, (_, i) => {
             const day = i + 1;
             const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            const isPast = dateStr < todayStr;
             const isBooked = isDateBooked(dateStr);
             const isStart = checkInDate === dateStr;
             const isEnd = checkOutDate === dateStr;
@@ -306,7 +316,9 @@ export default function ListingDetailPage() {
 
             let dayClasses = "rounded-full cursor-pointer transition text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-[#333]";
 
-            if (isBooked) {
+            if (isPast) {
+              dayClasses = "line-through decoration-rose-500 decoration-[1.5px] text-gray-400 dark:text-gray-600 bg-transparent cursor-not-allowed opacity-40 font-normal hover:bg-transparent";
+            } else if (isBooked) {
               dayClasses = "line-through text-gray-300 dark:text-gray-600 bg-gray-50/60 dark:bg-[#252525]/60 cursor-not-allowed font-normal";
             } else if (isStart || isEnd) {
               dayClasses = "bg-black dark:bg-white text-white dark:text-black font-bold rounded-full shadow-sm";
@@ -318,9 +330,9 @@ export default function ListingDetailPage() {
               <button
                 key={dateStr}
                 type="button"
-                disabled={isBooked}
+                disabled={isPast || isBooked}
                 onClick={() => handleDateClick(dateStr)}
-                title={isBooked ? "Reserved / Unavailable" : dateStr}
+                title={isPast ? "Date has passed" : isBooked ? "Reserved / Unavailable" : dateStr}
                 className={`w-full aspect-square flex items-center justify-center text-xs font-semibold ${dayClasses}`}
               >
                 {day}
