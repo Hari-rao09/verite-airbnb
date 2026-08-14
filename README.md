@@ -2,7 +2,6 @@
 
 <div align="center">
 
-![AirClone Banner](https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80)
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-air--clone--eta.vercel.app-ff385c?style=for-the-badge&logo=vercel&logoColor=white)](https://air-clone-eta.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
