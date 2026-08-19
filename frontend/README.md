@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VÉRITÉ ESCAPES
 
-## Getting Started
+A premium travel discovery homepage focused on curated stays, slow travel, architectural escapes, and distinctive destinations across India.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+VÉRITÉ ESCAPES is a frontend travel discovery experience designed with a premium editorial aesthetic.
+
+The homepage allows users to explore curated properties, discover travel categories, browse featured stays, and interact with destination-focused content through a responsive and polished interface.
+
+## Features
+
+- Premium travel discovery homepage
+- Responsive desktop and mobile layout
+- Destination search interface
+- Featured property cards
+- Curated property collections
+- Travel category navigation
+- Interactive property cards
+- Wishlist interactions
+- Hover and transition effects
+- Guest stories section
+- Newsletter subscription section
+- Responsive navigation
+- Premium editorial-style visual design
+
+## Tech Stack
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Lucide Icons
+
+## Project Structure
+
+```text
+verite-airbnb/
+├── public/
+├── src/
+├── components.json
+├── next.config.ts
+├── package.json
+├── package-lock.json
+├── postcss.config.mjs
+├── tsconfig.json
+├── README.md
+└── DECISIONS.md
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
