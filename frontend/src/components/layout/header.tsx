@@ -1,580 +1,350 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import {
-    Menu,
-    Search,
-    Heart,
-    MessageCircle,
-    UserCircle,
-    Bell,
-    Settings,
-    CircleHelp,
-    LogOut,
-    BriefcaseBusiness,
-    Sun,
-    Moon,
-} from "lucide-react";
-import Link from "next/link";
-import LoginModal from "@/components/auth/login-modal";
-import MessagesModal from "@/components/shared/messages-modal";
-
-import Logo from "../shared/logo";
-import SearchBar from "./searchBar";
+  Compass,
+  Heart,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Globe,
+  SlidersHorizontal,
+  Sparkles,
+  ChevronRight,
+  MapPin,
+  Trash2,
+} from 'lucide-react';
+import { useWishlistStore } from '@/lib/stores/wishlist-store';
+import { MOCK_PROPERTIES } from '@/data/mock-properties';
+import { Stay } from '@/types';
 
 interface HeaderProps {
-    activeTab?: string;
-    onTabChange?: (tab: string) => void;
+  onOpenFilter?: () => void;
+  onSelectProperty?: (stay: Stay) => void;
 }
 
-const Header = ({
-    activeTab: externalActiveTab,
-    onTabChange,
-}: HeaderProps = {}) => {
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const router = useRouter();
-    const [internalActiveTab, setInternalActiveTab] = useState("Homes");
-    const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
-    const [initialSearchSection, setInitialSearchSection] =
-        useState<"destination" | "dates" | "guests" | null>(null);
+export default function Header({ onOpenFilter, onSelectProperty }: HeaderProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [wishlistDrawerOpen, setWishlistDrawerOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
-    const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login");
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userName, setUserName] = useState("");
+  const { wishlistIds, toggleWishlist } = useWishlistStore();
+  const wishlistedStays = MOCK_PROPERTIES.filter((s) => wishlistIds.includes(s.id));
 
-    // Theme hook for Dark Mode
-    const { theme, setTheme, resolvedTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
-
-    const navItems = [
-        { videoSrc: "/videos/house.webm", label: "Homes" },
-        { videoSrc: "/videos/balloon.webm", label: "Experiences" },
-        { videoSrc: "/videos/consierge.webm", label: "Services" },
-    ];
-
-    const handleTabClick = (label: string) => {
-        if (onTabChange) {
-            onTabChange(label);
-        } else {
-            setInternalActiveTab(label);
-            router.push(`/?tab=${label}`);
-        }
+  useEffect(() => {
+    setMounted(true);
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    // Scroll listener
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setIsScrolled(true);
-                setIsExpanded(false);
-            } else {
-                setIsScrolled(false);
-                setIsExpanded(true);
-            }
-        };
-
-        handleScroll();
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
-    // Check localStorage for logged-in user
-    useEffect(() => {
-        const checkAuth = () => {
-            const token = localStorage.getItem("token");
-            const storedUser = localStorage.getItem("user");
-
-            if (token && storedUser) {
-                try {
-                    const parsed = JSON.parse(storedUser);
-                    setUserName(parsed.name || parsed.email || "");
-                    setIsLoggedIn(true);
-                } catch {
-                    setIsLoggedIn(true);
-                }
-            } else {
-                setIsLoggedIn(false);
-                setUserName("");
-            }
-        };
-
-        checkAuth();
-        window.addEventListener("storage", checkAuth);
-        return () => window.removeEventListener("storage", checkAuth);
-    }, []);
-
-    // Close menu when clicking outside
-    useEffect(() => {
-        const handleClickOutside = () => {
-            if (isMenuOpen) {
-                setIsMenuOpen(false);
-            }
-        };
-
-        if (isMenuOpen) {
-            document.addEventListener("click", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("click", handleClickOutside);
-        };
-    }, [isMenuOpen]);
-
-    const showExpanded = !isScrolled || isExpanded;
-
-    const handleBackdropClick = () => {
-        if (isScrolled && isExpanded) {
-            setIsExpanded(false);
-        }
-        if (isMenuOpen) {
-            setIsMenuOpen(false);
-        }
-    };
-
-    const handleOpenLogin = () => {
-        setAuthModalMode("login");
-        setIsMenuOpen(false);
-        setIsLoginModalOpen(true);
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setIsLoggedIn(false);
-        setUserName("");
-        setIsMenuOpen(false);
-        router.refresh();
-    };
-
-    const handleLoginSuccess = () => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            try {
-                const parsed = JSON.parse(storedUser);
-                setUserName(parsed.name || parsed.email || "");
-                setIsLoggedIn(true);
-            } catch (error) {
-                console.error("Failed to read logged-in user:", error);
-            }
-        } else {
-            setIsLoggedIn(true);
-        }
-    };
-
-    const userInitial = userName
-        ? userName.charAt(0).toUpperCase()
-        : "G";
-
-    return (
-        <>
-            {/* Backdrop */}
-            {(isScrolled && isExpanded) || isMenuOpen ? (
-                <div
-                    className="fixed inset-0 bg-black/20 dark:bg-black/40 z-40 backdrop-blur-[2px] transition-opacity"
-                    onClick={handleBackdropClick}
-                />
-            ) : null}
-
-            {/* HEADER */}
-            <header
-                className={`fixed top-0 left-0 right-0 z-50 flex justify-center bg-white/95 dark:bg-[#181818]/95 backdrop-blur-md w-full border-b border-gray-200 dark:border-[#2a2a2a] shadow-sm dark:shadow-none transition-all duration-300 ease-in-out ${
-                    showExpanded ? "h-[200px]" : "h-20"
-                }`}
+  return (
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          isScrolled
+            ? 'bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-800/80 shadow-2xl py-3.5 text-zinc-100'
+            : 'bg-gradient-to-b from-black/90 via-black/50 to-transparent py-5 text-white'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Brand Logo */}
+            <a
+              href="#"
+              className="flex items-center gap-2.5 group focus:outline-none"
             >
-                <nav className="h-20 flex items-center justify-between w-full max-w-[1824px] mx-auto px-6 md:px-10 lg:px-12">
+              <div className="w-10 h-10 rounded-full bg-amber-400/10 border border-amber-400/30 flex items-center justify-center transition-transform group-hover:scale-105">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-serif-editorial text-2xl font-bold tracking-wider uppercase text-amber-200">
+                  VÉRITÉ
+                </span>
+                <span className="text-[9px] tracking-[0.25em] uppercase text-zinc-400 -mt-1 font-medium">
+                  ESCAPES
+                </span>
+              </div>
+            </a>
 
-                    {/* LOGO */}
-                    <div 
-                        onClick={() => {
-                            if (onTabChange) onTabChange("Homes");
-                            router.push("/");
-                        }}
-                        className="cursor-pointer transition-transform duration-200 hover:scale-105"
-                    >
-                        <Logo />
-                    </div>
+            {/* Desktop Navigation Links */}
+            <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+              <a
+                href="#search-section"
+                className="transition-colors hover:text-amber-300 flex items-center gap-1.5 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 rounded-md px-1"
+              >
+                <Compass className="w-4 h-4 text-amber-400/80" />
+                Discover
+              </a>
+              <a
+                href="#featured-section"
+                className="transition-colors hover:text-amber-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 rounded-md px-1"
+              >
+                Featured Stays
+              </a>
+              <a
+                href="#editorial-section"
+                className="transition-colors hover:text-amber-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 rounded-md px-1"
+              >
+                Our Story
+              </a>
+              <a
+                href="#carousel-section"
+                className="transition-colors hover:text-amber-300 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 rounded-md px-1"
+              >
+                Curated Collections
+              </a>
+            </nav>
 
-                    {/* TOP NAVIGATION (Videos) */}
-                    <div
-                        className={`hidden lg:flex items-center gap-6 transition-all duration-300 ${
-                            showExpanded
-                                ? "opacity-100 scale-100"
-                                : "opacity-0 scale-95 pointer-events-none absolute"
-                        }`}
-                    >
-                        {navItems.map((item, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleTabClick(item.label)}
-                                className={`flex items-center gap-3 cursor-pointer group pb-2 border-b-2 transition-all duration-200 ${
-                                    activeTab === item.label
-                                        ? "border-black dark:border-white"
-                                        : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"
-                                }`}
-                            >
-                                <video
-                                    src={item.videoSrc}
-                                    autoPlay
-                                    muted
-                                    playsInline
-                                    loop
-                                    className="w-14 h-14 transition-transform duration-200 group-hover:scale-110"
-                                />
+            {/* Actions & Controls */}
+            <div className="flex items-center gap-3">
+              {/* Currency Badge */}
+              <button
+                type="button"
+                className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-zinc-500/20 hover:border-amber-400/40 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+                title="Currency & Language"
+                aria-label="Currency: INR (₹)"
+              >
+                <Globe className="w-3.5 h-3.5 text-amber-400" />
+                <span>INR (₹)</span>
+              </button>
 
-                                <span
-                                    className={`text-sm font-semibold transition-colors duration-200 ${
-                                        activeTab === item.label
-                                            ? "text-gray-900 dark:text-white"
-                                            : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200"
-                                    }`}
-                                >
-                                    {item.label}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* COMPACT SEARCH WHEN SCROLLED */}
-                    <div
-                        className={`hidden lg:flex items-center gap-4 flex-1 max-w-[478px] h-12 transition-all duration-300 ${
-                            !showExpanded
-                                ? "opacity-100 scale-100"
-                                : "opacity-0 scale-95 pointer-events-none absolute"
-                        }`}
-                    >
-                        <div className="flex items-center justify-center bg-white dark:bg-[#242424] border border-gray-300 dark:border-[#383838] rounded-full hover:shadow-lg dark:hover:shadow-black/40 transition-all duration-200 w-full h-full">
-
-                            <video
-                                src="/videos/house.webm"
-                                autoPlay
-                                muted
-                                playsInline
-                                loop
-                                className="w-7 h-7 ml-4"
-                            />
-
-                            <button
-                                onClick={() => {
-                                    setInitialSearchSection("destination");
-                                    setIsExpanded(true);
-                                }}
-                                className="flex-1 px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2e2e2e] rounded-full transition-colors cursor-pointer"
-                            >
-                                Anywhere
-                            </button>
-
-                            <div className="h-5 w-px bg-gray-300 dark:bg-gray-700" />
-
-                            <button
-                                onClick={() => {
-                                    setInitialSearchSection("dates");
-                                    setIsExpanded(true);
-                                }}
-                                className="flex-1 px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2e2e2e] rounded-full transition-colors cursor-pointer"
-                            >
-                                Anytime
-                            </button>
-
-                            <div className="h-5 w-px bg-gray-300 dark:bg-gray-700" />
-
-                            <button
-                                onClick={() => {
-                                    setInitialSearchSection("guests");
-                                    setIsExpanded(true);
-                                }}
-                                className="flex-1 px-3 py-2.5 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2e2e2e] rounded-full transition-colors cursor-pointer"
-                            >
-                                Add Guests
-                            </button>
-
-                            <div className="bg-primary text-white p-2 rounded-full mr-1">
-                                <Search className="w-4 h-4" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* RIGHT SIDE */}
-                    <div className="flex items-center gap-2 relative">
-
-                        {/* Become a host */}
-                        <Link
-                            href="/become-a-host"
-                            className="hidden md:block text-sm font-medium px-4 py-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-[#2c2c2c] text-gray-800 dark:text-gray-200 transition-all duration-200 cursor-pointer"
-                        >
-                            Become a host
-                        </Link>
-
-                        {/* DARK MODE TOGGLE (Replaced Globe) */}
-                        <button
-                            onClick={() => setTheme(isDark ? "light" : "dark")}
-                            className="p-2.5 hover:bg-gray-100 dark:hover:bg-[#2c2c2c] rounded-full transition-all duration-200 cursor-pointer text-gray-700 dark:text-gray-200"
-                            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-                            aria-label="Toggle dark mode"
-                        >
-                            {mounted ? (
-                                isDark ? (
-                                    <Sun className="w-5 h-5 text-amber-400 transition-transform duration-300 rotate-0 hover:rotate-45" />
-                                ) : (
-                                    <Moon className="w-5 h-5 text-gray-700 dark:text-gray-200 transition-transform duration-300 hover:-rotate-12" />
-                                )
-                            ) : (
-                                <div className="w-5 h-5" />
-                            )}
-                        </button>
-
-                        {/* MENU BUTTON */}
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#242424] border border-gray-300 dark:border-[#383838] rounded-full hover:shadow-md transition-all duration-200 cursor-pointer text-gray-700 dark:text-gray-200"
-                        >
-                            <Menu className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-
-                            <div className="w-8 h-8 bg-gray-200 dark:bg-[#383838] rounded-full flex items-center justify-center">
-                                <span className="text-gray-700 dark:text-gray-200 text-sm font-medium">
-                                    {userInitial}
-                                </span>
-                            </div>
-                        </button>
-
-                        {/* ================= MENU ================= */}
-                        {isMenuOpen && (
-                            <div
-                                className="absolute right-0 top-14 w-[320px] bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-xl border border-gray-200 dark:border-[#333333] overflow-hidden z-[60] text-gray-800 dark:text-gray-200"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-
-                                {!isLoggedIn ? (
-
-                                    /* ================= LOGGED OUT ================= */
-                                    <div className="py-2">
-
-                                        {/* SIGN UP */}
-                                        <button
-                                            onClick={() => {
-                                                setAuthModalMode("register");
-                                                setIsMenuOpen(false);
-                                                setIsLoginModalOpen(true);
-                                            }}
-                                            className="w-full text-left px-5 py-3.5 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
-                                        >
-                                            Sign up
-                                        </button>
-
-                                        {/* LOGIN */}
-                                        <button
-                                            onClick={() => {
-                                                setAuthModalMode("login");
-                                                setIsMenuOpen(false);
-                                                setIsLoginModalOpen(true);
-                                            }}
-                                            className="w-full text-left px-5 py-3.5 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
-                                        >
-                                            Log in
-                                        </button>
-
-                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
-
-                                        <Link
-                                            href="/become-a-host"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="block w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
-                                        >
-                                            Become a host
-                                        </Link>
-
-                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
-                                            Refer a host
-                                        </button>
-
-                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
-                                            Find a co-host
-                                        </button>
-
-                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
-
-                                        {/* DARK MODE QUICK TOGGLE IN MENU */}
-                                        <button
-                                            onClick={() => setTheme(isDark ? "light" : "dark")}
-                                            className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] flex items-center justify-between"
-                                        >
-                                            <span>Dark mode</span>
-                                            {isDark ? (
-                                                <Sun className="w-4 h-4 text-amber-400" />
-                                            ) : (
-                                                <Moon className="w-4 h-4 text-gray-500" />
-                                            )}
-                                        </button>
-
-                                        <button className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] flex items-center gap-3">
-                                            <CircleHelp className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            Help Centre
-                                        </button>
-
-                                    </div>
-
-                                ) : (
-
-                                    /* ================= LOGGED IN ================= */
-                                    <div className="py-2">
-
-                                        {/* USER INFO */}
-                                        <div className="px-5 py-3 border-b border-gray-200 dark:border-[#333333]">
-                                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                                                {userName}
-                                            </p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                Logged in
-                                            </p>
-                                        </div>
-
-                                        {/* WISHLISTS */}
-                                        <Link
-                                            href="/wishlists"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
-                                        >
-                                            <Heart className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            Wishlists
-                                        </Link>
-
-                                        {/* TRIPS / BOOKINGS */}
-                                        <Link
-                                            href="/bookings"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
-                                        >
-                                            <BriefcaseBusiness className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            Trips
-                                        </Link>
-
-                                        {/* MESSAGES */}
-                                        <button
-                                            onClick={() => {
-                                                setIsMenuOpen(false);
-                                                setIsMessagesModalOpen(true);
-                                            }}
-                                            className="w-full flex items-center justify-between px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <MessageCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                                <span>Messages</span>
-                                            </div>
-                                            <span className="px-1.5 py-0.5 rounded-full bg-[#FF385C] text-white text-[10px] font-bold">
-                                                1
-                                            </span>
-                                        </button>
-
-                                        {/* NOTIFICATIONS */}
-                                        <button className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
-                                            <Bell className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            Notifications
-                                        </button>
-
-                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
-
-                                        {/* MANAGE LISTINGS / BECOME A HOST */}
-                                        <Link
-                                            href="/become-a-host"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
-                                        >
-                                            Airbnb your home
-                                        </Link>
-
-                                        {/* PROFILE / ACCOUNT */}
-                                        <Link
-                                            href="/profile"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
-                                        >
-                                            <UserCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            Account
-                                        </Link>
-
-                                        <div className="border-t border-gray-200 dark:border-[#333333] my-1" />
-
-                                        {/* DARK MODE QUICK TOGGLE IN MENU */}
-                                        <button
-                                            onClick={() => setTheme(isDark ? "light" : "dark")}
-                                            className="w-full text-left px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] flex items-center justify-between"
-                                        >
-                                            <span>Dark mode</span>
-                                            {isDark ? (
-                                                <Sun className="w-4 h-4 text-amber-400" />
-                                            ) : (
-                                                <Moon className="w-4 h-4 text-gray-500" />
-                                            )}
-                                        </button>
-
-                                        {/* HELP */}
-                                        <button className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a]">
-                                            <CircleHelp className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                            Help Centre
-                                        </button>
-
-                                        {/* LOGOUT */}
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-5 py-3 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] text-red-600 dark:text-red-400"
-                                        >
-                                            <LogOut className="w-4 h-4" />
-                                            Log out
-                                        </button>
-
-                                    </div>
-
-                                )}
-
-                            </div>
-                        )}
-
-                    </div>
-
-                </nav>
-
-                {/* SEARCH BAR */}
-                <div
-                    className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${
-                        showExpanded
-                            ? "opacity-100 translate-y-0"
-                            : "opacity-0 translate-y-4 pointer-events-none"
-                    }`}
+              {/* Theme Toggle */}
+              {mounted && (
+                <button
+                  type="button"
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="p-2 rounded-full border border-zinc-500/20 hover:bg-zinc-800/40 transition-colors text-amber-400 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+                  aria-label="Toggle theme mode"
                 >
-                    <SearchBar
-                        key={initialSearchSection}
-                        initialSection={initialSearchSection}
-                    />
+                  {theme === 'dark' ? (
+                    <Sun className="w-4 h-4" />
+                  ) : (
+                    <Moon className="w-4 h-4 text-zinc-800" />
+                  )}
+                </button>
+              )}
+
+              {/* Wishlist Button */}
+              <button
+                type="button"
+                onClick={() => setWishlistDrawerOpen(true)}
+                className="relative p-2 rounded-full border border-zinc-500/20 hover:bg-zinc-800/40 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+                aria-label={`View Saved Wishlist (${wishlistIds.length} items)`}
+              >
+                <Heart className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+                {wishlistIds.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 text-zinc-950 font-bold text-[10px] rounded-full flex items-center justify-center">
+                    {wishlistIds.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Filter Trigger Button */}
+              {onOpenFilter && (
+                <button
+                  type="button"
+                  onClick={onOpenFilter}
+                  className="hidden md:flex items-center gap-2 text-xs font-medium px-3.5 py-2 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 hover:bg-amber-400/20 transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+                  aria-label="Open filter preferences"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>Filters</span>
+                </button>
+              )}
+
+              {/* Mobile Menu Trigger */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 rounded-lg border border-zinc-500/20 hover:bg-zinc-800/40 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+                aria-label="Toggle mobile menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5 text-amber-400" />
+                ) : (
+                  <Menu className="w-5 h-5 text-amber-400" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Drawer Navigation */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex flex-col bg-zinc-950/98 backdrop-blur-2xl text-white p-6 animate-in fade-in duration-200">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <span className="font-serif-editorial text-xl font-bold tracking-wider text-amber-200">
+                VÉRITÉ
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 rounded-full border border-zinc-800 focus:outline-none"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5 text-zinc-400" />
+            </button>
+          </div>
+
+          <nav className="flex flex-col gap-6 text-lg font-serif-editorial font-medium tracking-wide">
+            <a
+              href="#search-section"
+              onClick={() => setMobileMenuOpen(false)}
+              className="hover:text-amber-300 flex items-center justify-between border-b border-zinc-800 pb-3"
+            >
+              <span>Discover Escapes</span>
+              <ChevronRight className="w-5 h-5 text-amber-400" />
+            </a>
+            <a
+              href="#featured-section"
+              onClick={() => setMobileMenuOpen(false)}
+              className="hover:text-amber-300 flex items-center justify-between border-b border-zinc-800 pb-3"
+            >
+              <span>Featured Stays</span>
+              <ChevronRight className="w-5 h-5 text-amber-400" />
+            </a>
+            <a
+              href="#editorial-section"
+              onClick={() => setMobileMenuOpen(false)}
+              className="hover:text-amber-300 flex items-center justify-between border-b border-zinc-800 pb-3"
+            >
+              <span>Editorial Story</span>
+              <ChevronRight className="w-5 h-5 text-amber-400" />
+            </a>
+            <a
+              href="#reviews-section"
+              onClick={() => setMobileMenuOpen(false)}
+              className="hover:text-amber-300 flex items-center justify-between border-b border-zinc-800 pb-3"
+            >
+              <span>Guest Experiences</span>
+              <ChevronRight className="w-5 h-5 text-amber-400" />
+            </a>
+          </nav>
+
+          <div className="mt-auto pt-6 border-t border-zinc-800 flex flex-col gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setWishlistDrawerOpen(true);
+              }}
+              className="flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-400 text-zinc-950 font-semibold text-sm"
+              aria-label="Open Saved Wishlist"
+            >
+              <Heart className="w-4 h-4 fill-zinc-950" />
+              <span>Saved Wishlist ({wishlistIds.length})</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Wishlist Drawer */}
+      {wishlistDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-zinc-900 text-white h-full flex flex-col shadow-2xl border-l border-zinc-800 animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Heart className="w-5 h-5 text-amber-400 fill-amber-400" />
+                <h3 className="font-serif-editorial text-xl font-bold text-amber-100">
+                  Your Saved Escapes ({wishlistedStays.length})
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setWishlistDrawerOpen(false)}
+                className="p-2 rounded-full border border-zinc-800 hover:bg-zinc-800 focus:outline-none"
+                aria-label="Close wishlist"
+              >
+                <X className="w-5 h-5 text-zinc-400" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {wishlistedStays.length === 0 ? (
+                <div className="py-16 text-center text-zinc-400 space-y-3">
+                  <Heart className="w-12 h-12 stroke-1 text-zinc-600 mx-auto" />
+                  <p className="font-serif-editorial text-lg text-zinc-300">
+                    Your wishlist is empty.
+                  </p>
+                  <p className="text-xs text-zinc-500 max-w-xs mx-auto">
+                    Click the heart icon on any stay card to save your favourite sanctuaries.
+                  </p>
                 </div>
-            </header>
+              ) : (
+                wishlistedStays.map((stay) => (
+                  <div
+                    key={stay.id}
+                    className="flex gap-4 p-3 rounded-xl bg-zinc-800/40 border border-zinc-800 hover:border-amber-400/30 transition-all group"
+                  >
+                    <img
+                      src={stay.images[0]}
+                      alt={stay.title}
+                      className="w-20 h-20 rounded-lg object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] tracking-wider uppercase text-amber-400 font-semibold">
+                          {stay.type}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => toggleWishlist(stay.id)}
+                          className="text-zinc-500 hover:text-red-400 transition-colors p-1"
+                          aria-label={`Remove ${stay.title} from wishlist`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <h4
+                        onClick={() => {
+                          setWishlistDrawerOpen(false);
+                          onSelectProperty?.(stay);
+                        }}
+                        className="text-sm font-semibold text-zinc-200 truncate cursor-pointer hover:text-amber-300"
+                      >
+                        {stay.title}
+                      </h4>
+                      <p className="text-xs text-zinc-400 flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3 text-amber-400" />
+                        {stay.location}
+                      </p>
+                      <p className="text-xs font-bold text-amber-200 mt-2">
+                        ₹{stay.price.toLocaleString('en-IN')}{' '}
+                        <span className="font-normal text-zinc-400">/ night</span>
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
 
-            {/* LOGIN MODAL */}
-            {isLoginModalOpen && (
-                <LoginModal
-                    initialMode={authModalMode}
-                    onClose={() => setIsLoginModalOpen(false)}
-                    onLoginSuccess={handleLoginSuccess}
-                />
-            )}
-
-            {/* MESSAGES & HOST INBOX MODAL */}
-            <MessagesModal
-                isOpen={isMessagesModalOpen}
-                onClose={() => setIsMessagesModalOpen(false)}
-            />
-        </>
-    );
-};
-
-export default Header;
+            <div className="p-6 border-t border-zinc-800 bg-zinc-950">
+              <button
+                type="button"
+                onClick={() => setWishlistDrawerOpen(false)}
+                className="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-sm transition-colors text-center"
+              >
+                Close Wishlist
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

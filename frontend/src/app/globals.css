@@ -3,97 +3,89 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-    /*========== COLORS ========== */
-    --color-primary: #ff385c;
-    --color-secondary: #222222;
-    --color-tertiary: #717171;
-
-    --color-text: #222222;
-    --color-text-2: #6A6A6A;
-
-    --color-bg-primary: #c1c1c1;
-    --color-navbar: #f8f8f8;
-
-    --color-border-primary: #ebebeb;
-    --color-border-secondary: #dddddd;
-}
-
-/* ========== AIRBNB CEREAL FONTS ========== */
-@font-face {
-  font-family: 'Airbnb Cereal';
-  src: url('/fonts/AirbnbCereal_W_Lt.otf') format('opentype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Airbnb Cereal';
-  src: url('/fonts/AirbnbCereal_W_Bk.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Airbnb Cereal';
-  src: url('/fonts/AirbnbCereal_W_Md.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Airbnb Cereal';
-  src: url('/fonts/AirbnbCereal_W_Bd.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Airbnb Cereal';
-  src: url('/fonts/AirbnbCereal_W_XBd.otf') format('opentype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Airbnb Cereal';
-  src: url('/fonts/AirbnbCereal_W_Blk.otf') format('opentype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer base {
+  :root {
+    --bg-primary: #fbfbfb;
+    --bg-secondary: #f4f4f5;
+    --bg-surface: #ffffff;
+    --bg-glass: rgba(255, 255, 255, 0.85);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --text-main: #111115;
+    --text-muted: #66666e;
+    --accent-gold: #c59b27;
+    --accent-gold-hover: #b38918;
+  }
+
+  .dark {
+    --bg-primary: #0b0b0e;
+    --bg-secondary: #121217;
+    --bg-surface: #18181f;
+    --bg-glass: rgba(18, 18, 23, 0.82);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-main: #f4f4f6;
+    --text-muted: #a0a0ab;
+    --accent-gold: #e2c08d;
+    --accent-gold-hover: #f3d4a4;
+  }
+
   *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    box-sizing: border-box;
   }
+  
   html {
-      scroll-behavior: smooth;
+    scroll-behavior: smooth;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
+
   body {
-    font-family: 'Airbnb Cereal', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-  input,
-  button,
-  textarea {
-      border: none;
-      outline: none;
-  }
-  ul, li {
-      list-style: none;
-  }
-  a {
-      text-decoration: none;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
   }
 }
 
+/* Custom Editorial Fonts */
+.font-serif-editorial {
+  font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif;
+}
+
+/* Infinite Ticker Keyframe Animation */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 32s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Glassmorphism Utilities */
+.glass-nav {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+}
+
+/* Custom Scrollbar */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -102,66 +94,24 @@
   display: none;
 }
 
-/* ========== AIRBNB MAP MARKERS ========== */
-.airbnb-price-marker {
-  background: white;
-  color: #222222;
-  font-weight: 700;
-  font-size: 13px;
-  padding: 5px 9px;
-  border-radius: 20px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  white-space: nowrap;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* Custom Image Zoom & Lift */
+.image-zoom-container {
+  overflow: hidden;
+}
+.image-zoom-container img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.image-zoom-container:hover img {
+  transform: scale(1.06);
 }
 
-.airbnb-price-marker:hover,
-.airbnb-price-marker.active {
-  background: #222222;
-  color: white;
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  z-index: 999 !important;
+/* Subtle Shimmer for Image Loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-
-.dark .airbnb-price-marker {
-  background: #1e1e1e;
-  color: #ffffff;
-  border: 1px solid #333333;
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
-
-.dark .airbnb-price-marker:hover,
-.dark .airbnb-price-marker.active {
-  background: #ffffff;
-  color: #000000;
-}
-
-.leaflet-popup-content-wrapper {
-  border-radius: 16px !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.2) !important;
-}
-.leaflet-popup-content {
-  margin: 0 !important;
-  line-height: normal !important;
-}
-
-/* ========== AIRBNB MODAL ANIMATIONS ========== */
-.airbnb-modal-spring {
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              scale 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.airbnb-backdrop-fade {
-  transition: opacity 0.35s ease-out,
-              backdrop-filter 0.35s ease-out;
-}
-
-

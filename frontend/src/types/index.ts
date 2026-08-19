@@ -1,113 +1,66 @@
-export interface User {
-  id: string
-  email: string
-  name: string
-  role: 'GUEST' | 'HOST' | 'ADMIN'
-  avatar?: string
-  createdAt: string
-}
-
-export interface Property {
-  id: string
-  title: string
-  description: string
-  price: number
-  currency: string
-  propertyType: 'APARTMENT' | 'HOUSE' | 'VILLA' | 'CONDO' | 'STUDIO' | 'CABIN'
-  maxGuests: number
-  bedrooms: number
-  bathrooms: number
-  address: string
-  city: string
-  state?: string
-  country: string
-  zipCode: string
-  latitude: number
-  longitude: number
-  amenities: string[]
-  images: string[]
-  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
-  hostId: string
-  host?: User
-  createdAt: string
-  updatedAt: string
-  isGuestFavorite?: boolean
-  rating?: number
-}
-
-export interface Booking {
-  id: string
-  propertyId: string
-  property?: Property
-  guestId: string
-  guest?: User
-  checkIn: string
-  checkOut: string
-  guests: number
-  totalPrice: number
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Payment {
-  id: string
-  bookingId: string
-  booking?: Booking
-  amount: number
-  currency: string
-  stripePaymentIntentId: string
-  status: 'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'REFUNDED'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Review {
-  id: string
-  bookingId: string
-  booking?: Booking
-  propertyId: string
-  property?: Property
-  userId: string
-  user?: User
-  rating: number
-  comment?: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Favorite {
-  id: number;
-  user_id: number;
-  listing_id: number;
-}
-
-export interface HostReservation {
+export interface Stay {
   id: string;
-  guestId: string;
-  listingId: string;
-  checkIn: string;
-  checkOut: string;
+  title: string;
+  tagline: string;
+  location: string;
+  region: string;
+  country: string;
+  type: string;
+  category: string;
   guests: number;
-  totalPrice: number;
-  status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'PENDING' | string;
-  nights: number;
-  listing: {
-    id: string;
-    title: string;
-    location: string;
-    propertyType: string;
-    pricePerNight: number;
-    imageUrl?: string;
-  };
-  guest: {
-    id: string;
-    name: string;
-    email: string;
+  bedrooms: number;
+  bathrooms: number;
+  price: number; // In INR (₹)
+  rating: number;
+  reviewCount: number;
+  images: string[];
+  featured?: boolean;
+  editorialPick?: boolean;
+  superhost?: boolean;
+  badge?: string;
+  description: string;
+  amenities: string[];
+  coordinates: {
+    lat: number;
+    lng: number;
   };
 }
 
-export interface AuthResponse {
-  user: User
-  token: string
+export interface Category {
+  id: string;
+  label: string;
+  iconName: string;
+  description: string;
+}
+
+export interface ReviewItem {
+  id: string;
+  quote: string;
+  author: string;
+  role: string;
+  location: string;
+  avatar: string;
+  stayTitle: string;
+  rating: number;
+  date: string;
+}
+
+export interface SearchState {
+  destination: string;
+  checkIn: Date | null;
+  checkOut: Date | null;
+  guests: {
+    adults: number;
+    children: number;
+    infants: number;
+    pets: number;
+  };
+}
+
+export interface FilterState {
+  category: string;
+  priceRange: [number, number];
+  propertyTypes: string[];
+  bedrooms: number | 'any';
+  superhostOnly: boolean;
 }

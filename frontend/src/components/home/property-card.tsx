@@ -1,217 +1,113 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import {
-  Heart,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-} from "lucide-react";
-
-import type { Property } from "@/types";
-import { favoritesApi } from "@/lib/api/favorites";
+import { useState, useEffect } from 'react';
+import { Heart, Star, MapPin, Sparkles, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { Stay } from '@/types';
+import { useWishlistStore } from '@/lib/stores/wishlist-store';
 
 interface PropertyCardProps {
-  property: Property;
+  stay: Stay;
+  onSelect: (stay: Stay) => void;
 }
 
-const PropertyCard = ({ property }: PropertyCardProps) => {
+export default function PropertyCard({ stay, onSelect }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const router = useRouter();
-  const [isHovered, setIsHovered] = useState(false);
-  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { isWishlisted, toggleWishlist } = useWishlistStore();
 
-  // Check if this property is already in the user's wishlist
   useEffect(() => {
-    const checkWishlist = async () => {
-      const token = localStorage.getItem("token");
+    setMounted(true);
+  }, []);
 
-      if (!token) {
-        return;
-      }
-
-      try {
-        const wishlist = await favoritesApi.getAll();
-
-        const alreadyLiked = wishlist.some(
-  (item) => String(item.listing_id) === String(property.id)
-);
-
-        setIsLiked(alreadyLiked);
-      } catch (error) {
-        console.error("Failed to load wishlist:", error);
-      }
-    };
-
-    checkWishlist();
-  }, [property.id]);
+  const wishlisted = mounted ? isWishlisted(stay.id) : false;
 
   const nextImage = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
-
-    if (currentImageIndex < property.images.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    }
+    setCurrentImageIndex((prev) => (prev + 1) % stay.images.length);
   };
 
   const prevImage = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
-
-    if (currentImageIndex > 0) {
-      setCurrentImageIndex(currentImageIndex - 1);
-    }
-  };
-
-  const toggleLike = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("Please log in to save properties.");
-      return;
-    }
-
-    if (favoriteLoading) {
-      return;
-    }
-
-    try {
-      setFavoriteLoading(true);
-
-      if (isLiked) {
-        // Remove from wishlist
-        await favoritesApi.remove(String(property.id));
-
-        setIsLiked(false);
-      } else {
-        // Add to wishlist
-        await favoritesApi.add(String(property.id));
-
-        setIsLiked(true);
-      }
-    } catch (error: any) {
-      console.error("Failed to update wishlist:", error);
-
-      if (error?.response?.status === 401) {
-        alert("Please log in again.");
-      } else {
-        console.error(
-          "Wishlist error:",
-          error?.response?.data || error
-        );
-
-        alert("Failed to update wishlist. Please try again.");
-      }
-    } finally {
-      setFavoriteLoading(false);
-    }
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? stay.images.length - 1 : prev - 1
+    );
   };
 
   return (
-    <article
-  className="w-full cursor-pointer group"
-  onClick={() => router.push(`/listing/${property.id}`)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <div
+      onClick={() => onSelect(stay)}
+      className="group relative bg-zinc-900/60 border border-zinc-800/80 rounded-3xl overflow-hidden hover:border-amber-400/40 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-amber-400/5 cursor-pointer flex flex-col"
     >
-      {/* IMAGE */}
-      <div
-        className="relative w-full rounded-xl overflow-hidden mb-3"
-        style={{ aspectRatio: "251.14 / 238.58" }}
-      >
-        <Image
-          src={property.images[currentImageIndex] || "/placeholder.jpg"}
-          alt={property.title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-          sizes="(max-width: 640px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 20vw"
+      {/* Image Container */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-950">
+        <img
+          src={stay.images[currentImageIndex]}
+          alt={stay.title}
+          className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
         />
 
-        {/* Guest Favorite */}
-        {property.isGuestFavorite && (
-          <div className="absolute top-2.5 left-2.5">
-            <div className="bg-white rounded-2xl px-2 py-1 shadow-sm">
-              <span className="text-xs font-semibold text-secondary">
-                Guest favorite
-              </span>
-            </div>
+        {/* Gradient Overlay for Readable Text */}
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-black/20" />
+
+        {/* Badge Tag */}
+        {stay.badge && (
+          <div className="absolute top-3.5 left-3.5 z-10 px-3 py-1 rounded-full bg-zinc-950/80 backdrop-blur-md border border-amber-400/30 text-[10px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-amber-400" />
+            <span>{stay.badge}</span>
           </div>
         )}
 
-        {/* FAVORITE BUTTON */}
+        {/* Wishlist Button */}
         <button
-          onClick={toggleLike}
-          disabled={favoriteLoading}
-          className={`absolute top-3 right-3 p-1.5 transition-transform ${
-            favoriteLoading
-              ? "opacity-50 cursor-wait"
-              : "hover:scale-110"
-          }`}
-          aria-label={
-            isLiked
-              ? "Remove from favorites"
-              : "Add to favorites"
-          }
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleWishlist(stay.id);
+          }}
+          className="absolute top-3.5 right-3.5 z-10 p-2.5 rounded-full bg-zinc-950/60 backdrop-blur-md border border-white/10 hover:scale-110 active:scale-95 transition-all text-white focus:outline-none"
+          aria-label="Save to Wishlist"
         >
           <Heart
-            className={`w-6 h-6 transition-colors ${
-              isLiked
-                ? "fill-primary text-primary"
-                : "fill-black/50 text-white stroke-2"
+            className={`w-4 h-4 transition-colors ${
+              wishlisted
+                ? 'fill-red-500 text-red-500 scale-110'
+                : 'text-zinc-300 hover:text-white'
             }`}
           />
         </button>
 
-        {/* PREVIOUS / NEXT */}
-        {property.images.length > 1 && isHovered && (
-          <>
-            {currentImageIndex > 0 && (
-              <button
-                onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2
-                  w-7 h-7 rounded-full bg-white/90
-                  flex items-center justify-center
-                  hover:bg-white hover:scale-105
-                  transition-all shadow-md"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-4 h-4 text-secondary" />
-              </button>
-            )}
-
-            {currentImageIndex < property.images.length - 1 && (
-              <button
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2
-                  w-7 h-7 rounded-full bg-white/90
-                  flex items-center justify-center
-                  hover:bg-white hover:scale-105
-                  transition-all shadow-md"
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-4 h-4 text-secondary" />
-              </button>
-            )}
-          </>
+        {/* Image Navigation Arrows (Visible on Hover) */}
+        {stay.images.length > 1 && (
+          <div className="absolute inset-0 z-10 flex items-center justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              type="button"
+              onClick={prevImage}
+              className="p-1.5 rounded-full bg-zinc-950/80 text-white hover:bg-amber-400 hover:text-zinc-950 transition-colors"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={nextImage}
+              className="p-1.5 rounded-full bg-zinc-950/80 text-white hover:bg-amber-400 hover:text-zinc-950 transition-colors"
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         )}
 
-        {/* IMAGE DOTS */}
-        {property.images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
-            {property.images.slice(0, 5).map((_, index) => (
+        {/* Carousel Dots */}
+        {stay.images.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5">
+            {stay.images.map((_, i) => (
               <span
-                key={index}
-                className={`w-1.5 h-1.5 rounded-full transition-all ${
-                  index === currentImageIndex
-                    ? "bg-white scale-110"
-                    : "bg-white/60"
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === currentImageIndex
+                    ? 'w-4 bg-amber-400'
+                    : 'w-1.5 bg-white/40'
                 }`}
               />
             ))}
@@ -219,44 +115,48 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         )}
       </div>
 
-      {/* PROPERTY INFORMATION */}
-      <div className="space-y-0.5">
-        {/* TITLE + RATING */}
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-medium text-[15px] text-secondary truncate flex-1">
-            {property.title}
+      {/* Card Content Body */}
+      <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <span className="text-[11px] font-bold tracking-widest uppercase text-amber-400/90">
+              {stay.type}
+            </span>
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800 text-xs font-bold text-amber-300 border border-zinc-700/60">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <span>{stay.rating.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <h3 className="font-serif-editorial text-lg font-bold text-zinc-100 group-hover:text-amber-200 transition-colors line-clamp-1">
+            {stay.title}
           </h3>
 
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <Star className="w-3.5 h-3.5 fill-secondary text-secondary" />
+          <p className="text-xs text-zinc-400 flex items-center gap-1 mt-1">
+            <MapPin className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+            <span className="truncate">{stay.location}</span>
+          </p>
 
-            <span className="text-sm text-secondary">
-              {(property.rating ?? 0).toFixed(2)}
-            </span>
-          </div>
+          <p className="text-xs text-zinc-500 line-clamp-2 mt-2 font-light">
+            {stay.tagline}
+          </p>
         </div>
 
-        {/* LOCATION */}
-        <p className="text-sm text-text-2 truncate">
-          {property.city}, {property.country}
-        </p>
+        {/* Price & Action */}
+        <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+          <div>
+            <span className="text-lg font-extrabold text-zinc-100 font-sans">
+              ₹{stay.price.toLocaleString('en-IN')}
+            </span>
+            <span className="text-xs text-zinc-400 font-normal"> / night</span>
+          </div>
 
-        {/* PROPERTY TYPE */}
-        <p className="text-sm text-text-2 capitalize">
-          {property.propertyType.toLowerCase()}
-        </p>
-
-        {/* PRICE */}
-        <p className="text-[15px] text-secondary pt-1">
-          <span className="font-semibold">
-            ₹{property.price.toLocaleString("en-IN")}
-          </span>
-
-          <span className="font-normal"> night</span>
-        </p>
+          <div className="flex items-center gap-1 text-xs font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
+            <span>Explore</span>
+            <Eye className="w-3.5 h-3.5" />
+          </div>
+        </div>
       </div>
-    </article>
+    </div>
   );
-};
-
-export default PropertyCard;
+}

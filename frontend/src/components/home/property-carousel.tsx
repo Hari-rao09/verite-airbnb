@@ -1,179 +1,88 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Property } from "@/types";
-import PropertyCard from "./property-card";
-
-
+import { useRef } from 'react';
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Stay } from '@/types';
+import PropertyCard from './property-card';
 
 interface PropertyCarouselProps {
-  properties: Property[];
-  title?: string;
+  title: string;
+  subtitle?: string;
+  stays: Stay[];
+  onSelectProperty: (stay: Stay) => void;
 }
 
-const PropertyCarousel = ({ properties, title }: PropertyCarouselProps) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const [cardWidth, setCardWidth] = useState(0);
-  const [cardsToScroll, setCardsToScroll] = useState(1);
+export default function PropertyCarousel({
+  title,
+  subtitle,
+  stays,
+  onSelectProperty,
+}: PropertyCarouselProps) {
+  const carouselRef = useRef<HTMLDivElement>(null);
 
-  // Calcular el ancho de cada card y cuántas scrollear basado en breakpoint
-  const updateScrollConfig = useCallback(() => {
-    if (!scrollContainerRef.current) return;
-    
-    const container = scrollContainerRef.current;
-    const firstCard = container.querySelector('[data-property-card]') as HTMLElement;
-    
-    if (firstCard) {
-      const gap = 16; // gap-4 = 16px
-      setCardWidth(firstCard.offsetWidth + gap);
+  const scroll = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const scrollAmount = direction === 'left' ? -340 : 340;
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
-
-    // Breakpoint 744px: 4 cards, sino 1 card
-    const viewportWidth = window.innerWidth;
-    if (viewportWidth >= 744) {
-      setCardsToScroll(4);
-    } else {
-      setCardsToScroll(1);
-    }
-  }, []);
-
-  // Verificar si se puede scrollear
-  const checkScrollability = useCallback(() => {
-    if (!scrollContainerRef.current) return;
-    
-    const container = scrollContainerRef.current;
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    
-    setCanScrollLeft(scrollLeft > 5);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
-  }, []);
-
-  // Scroll hacia la izquierda
-  const scrollLeft = () => {
-    if (!scrollContainerRef.current || !canScrollLeft) return;
-    
-    const scrollAmount = cardWidth * cardsToScroll;
-    scrollContainerRef.current.scrollBy({
-      left: -scrollAmount,
-      behavior: "smooth",
-    });
   };
-
-  // Scroll hacia la derecha
-  const scrollRight = () => {
-    if (!scrollContainerRef.current || !canScrollRight) return;
-    
-    const scrollAmount = cardWidth * cardsToScroll;
-    scrollContainerRef.current.scrollBy({
-      left: scrollAmount,
-      behavior: "smooth",
-    });
-  };
-
-  useEffect(() => {
-    updateScrollConfig();
-    checkScrollability();
-
-    const handleResize = () => {
-      updateScrollConfig();
-      checkScrollability();
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [updateScrollConfig, checkScrollability]);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    container.addEventListener("scroll", checkScrollability, { passive: true });
-    return () => container.removeEventListener("scroll", checkScrollability);
-  }, [checkScrollability]);
 
   return (
-    <section className="relative w-full">
-      <div className="flex items-center justify-between max-w-[1824px] mx-auto px-6 md:px-10 lg:px-12 mb-4">
-        {title && (
-          <h2 className="text-[22px] font-semibold text-secondary">
-            {title}
-          </h2>
-        )}
-        
-        <div className="hidden sm:flex gap-2">
-          <button
-            onClick={scrollLeft}
-            disabled={!canScrollLeft}
-            className={`
-              w-8 h-8 rounded-full bg-white border border-border-secondary
-              flex items-center justify-center
-              transition-all duration-200
-              ${!canScrollLeft 
-                ? "opacity-50 cursor-not-allowed" 
-                : "hover:shadow-md hover:scale-105 cursor-pointer"
-              }
-            `}
-            aria-label="Anterior"
-          >
-            <ChevronLeft className="w-4 h-4 text-secondary" />
-          </button>
+    <section id="carousel-section" className="py-12 bg-zinc-950/60 border-b border-zinc-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header with Controls */}
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-400 mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Curated Collection</span>
+            </div>
+            <h2 className="font-serif-editorial text-2xl sm:text-4xl font-bold text-zinc-100">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="text-xs sm:text-sm text-zinc-400 mt-1 font-light">
+                {subtitle}
+              </p>
+            )}
+          </div>
 
-          <button
-            onClick={scrollRight}
-            disabled={!canScrollRight}
-            className={`
-              w-8 h-8 rounded-full bg-white border border-border-secondary
-              flex items-center justify-center
-              transition-all duration-200
-              ${!canScrollRight 
-                ? "opacity-50 cursor-not-allowed" 
-                : "hover:shadow-md hover:scale-105 cursor-pointer"
-              }
-            `}
-            aria-label="Siguiente"
-          >
-            <ChevronRight className="w-4 h-4 text-secondary" />
-          </button>
-        </div>
-      </div>
-
-      <div className="relative max-w-[1824px] mx-auto px-6 md:px-10 lg:px-12">
-
-        <div
-          ref={scrollContainerRef}
-          className="
-            flex gap-4 overflow-x-auto scrollbar-hide
-            scroll-smooth snap-x snap-mandatory
-            touch-pan-x
-          "
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
-        >
-          {properties.map((property) => (
-            <div
-              key={property.id}
-              data-property-card
-              className="
-                flex-shrink-0 snap-start
-                w-[calc(50%-8px)] min-w-[140px]
-                sm:w-[calc(33.333%-11px)]
-                md:w-[calc(25%-12px)]
-                lg:w-[calc(14.285%-14px)]
-                xl:w-[247px]
-              "
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => scroll('left')}
+              className="p-2.5 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 hover:border-amber-400 hover:text-amber-400 transition-colors focus:outline-none"
+              aria-label="Scroll left"
             >
-              <PropertyCard property={property} />
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll('right')}
+              className="p-2.5 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 hover:border-amber-400 hover:text-amber-400 transition-colors focus:outline-none"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Carousel Tracks */}
+        <div
+          ref={carouselRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory py-2 -mx-4 px-4 sm:mx-0 sm:px-0"
+        >
+          {stays.map((stay) => (
+            <div
+              key={stay.id}
+              className="w-[280px] sm:w-[320px] md:w-[350px] flex-shrink-0 snap-start"
+            >
+              <PropertyCard stay={stay} onSelect={onSelectProperty} />
             </div>
           ))}
         </div>
       </div>
     </section>
   );
-};
-
-export default PropertyCarousel;
+}

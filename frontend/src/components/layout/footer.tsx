@@ -1,158 +1,83 @@
-"use client";
+'use client';
 
-import { Facebook, Instagram, Twitter, Globe } from "lucide-react";
-import Link from "next/link";
+import { Sparkles, Globe, Heart } from 'lucide-react';
 
-const Footer = () => {
-  const supportLinks = [
-    { label: "Centro de ayuda", href: "/help" },
-    { label: "Ayuda: problema de seguridad", href: "/help/safety" },
-    { label: "AirCover", href: "/aircover" },
-    { label: "Lucha contra la discriminación", href: "/against-discrimination" },
-    { label: "Ayuda a la discapacidad", href: "/accessibility" },
-    { label: "Opciones de cancelación", href: "/help/cancellation" },
-    { label: "¿Problemas en el barrio?", href: "/neighbors" },
-  ];
-
-  const hostLinks = [
-    { label: "Pon tu casa en Airbnb", href: "/host/homes" },
-    { label: "Pon tu experiencia en Airbnb", href: "/host/experiences" },
-    { label: "Pon tu servicio en Airbnb", href: "/host/services" },
-    { label: "AirCover para anfitriones", href: "/aircover-for-hosts" },
-    { label: "Recursos para anfitriones", href: "/resources" },
-    { label: "Foro de la comunidad", href: "/community" },
-    { label: "Ser un anfitrión responsable", href: "/responsible-hosting" },
-    { label: "Apúntate a una clase gratuita", href: "/intro-to-hosting" },
-    { label: "Busca un coanfitrión", href: "/co-hosts" },
-  ];
-
-  const airbnbLinks = [
-    { label: "Novedades", href: "/release" },
-    { label: "Newsroom", href: "/press/news" },
-    { label: "Empleo", href: "/careers" },
-    { label: "Inversores", href: "/investors" },
-    { label: "Tarjetas regalo", href: "/giftcards" },
-    { label: "Estancias con Airbnb.org", href: "/airbnb-org" },
-  ];
-
+export default function Footer() {
   return (
-    <footer className="bg-gray-100 border-t border-border-primary">
-      <div className="max-w-[1824px] mx-auto px-6 md:px-10 lg:px-12 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-sm font-semibold text-secondary mb-4">Asistencia</h3>
-            <ul className="space-y-3">
-              {supportLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-secondary hover:underline"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+    <footer className="bg-zinc-950 text-zinc-400 border-t border-zinc-900 pt-16 pb-12 font-sans text-xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b border-zinc-900">
+          {/* Brand Col */}
+          <div className="md:col-span-2 space-y-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <span className="font-serif-editorial text-2xl font-bold tracking-wider text-amber-200 uppercase">
+                VÉRITÉ
+              </span>
+            </div>
+            <p className="text-zinc-400 text-xs font-light max-w-sm leading-relaxed">
+              Discover places worth travelling for. VÉRITÉ Escapes curates architectural sanctuaries, heritage havens, and slow travel retreats across India and worldwide.
+            </p>
+            <div className="flex items-center gap-2 text-[11px] text-amber-400/90 font-medium">
+              <Globe className="w-3.5 h-3.5" />
+              <span>India • International Destinations</span>
+            </div>
+          </div>
+
+          {/* Destinations Col */}
+          <div className="space-y-3">
+            <h4 className="font-serif-editorial text-sm font-bold text-zinc-100 uppercase tracking-wider">
+              Destinations
+            </h4>
+            <ul className="space-y-2 text-zinc-400">
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Shimla & Himalayas</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Udaipur & Mewar Forts</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">North Goa Coast</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Coorg Tea Estates</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Wayanad Rainforests</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Jaisalmer Desert</a></li>
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-secondary mb-4">Cómo ser anfitrión</h3>
-            <ul className="space-y-3">
-              {hostLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-secondary hover:underline"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+          {/* Curation Col */}
+          <div className="space-y-3">
+            <h4 className="font-serif-editorial text-sm font-bold text-zinc-100 uppercase tracking-wider">
+              Collections
+            </h4>
+            <ul className="space-y-2 text-zinc-400">
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Heritage Palaces</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Alpine Chalets</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Forest Cabins</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Architectural Gems</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Slow Living Retreats</a></li>
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-secondary mb-4">Airbnb</h3>
-            <ul className="space-y-3">
-              {airbnbLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-secondary hover:underline"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+          {/* Brand Col */}
+          <div className="space-y-3">
+            <h4 className="font-serif-editorial text-sm font-bold text-zinc-100 uppercase tracking-wider">
+              About VÉRITÉ
+            </h4>
+            <ul className="space-y-2 text-zinc-400">
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Our Manifesto</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Host Curation Audit</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Press & Media</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Sustainability Standard</a></li>
+              <li><a href="#" className="hover:text-amber-300 transition-colors">Private Dispatches</a></li>
             </ul>
           </div>
         </div>
-      </div>
 
-      <div className="border-t border-border-primary">
-        <div className="max-w-[1824px] mx-auto px-6 md:px-10 lg:px-12 py-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 text-sm font-semibold text-secondary hover:underline">
-                <Globe className="w-4 h-4" />
-                <span>Español (ES)</span>
-              </button>
-              <button className="flex items-center gap-1 text-sm font-semibold text-secondary hover:underline">
-                <span>€</span>
-                <span>EUR</span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Link
-                href="https://facebook.com/airbnb"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-5 h-5 text-secondary" />
-              </Link>
-              <Link
-                href="https://twitter.com/airbnb"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5 text-secondary" />
-              </Link>
-              <Link
-                href="https://instagram.com/airbnb"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-5 h-5 text-secondary" />
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-6 text-sm text-secondary">
-            <span>© 2026 Airbnb, Inc.</span>
-            <span className="hidden md:inline">·</span>
-            <Link href="/terms/privacy" className="hover:underline">
-              Privacidad
-            </Link>
-            <span className="hidden md:inline">·</span>
-            <Link href="/terms" className="hover:underline">
-              Condiciones
-            </Link>
-            <span className="hidden md:inline">·</span>
-            <Link href="/about/company-details" className="hover:underline">
-              Datos de la empresa
-            </Link>
+        {/* Bottom Copyright & Legal */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-500">
+          <p>© 2026 VÉRITÉ ESCAPES. All rights reserved. Crafted with care for slow travel.</p>
+          <div className="flex items-center gap-6">
+            <a href="#" className="hover:text-zinc-300 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-zinc-300 transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-zinc-300 transition-colors">Curation Standards</a>
           </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}
